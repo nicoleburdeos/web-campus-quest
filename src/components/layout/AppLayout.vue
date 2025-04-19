@@ -28,7 +28,7 @@ function onClick() {
           @click="onClick"
         ></v-btn>
       </v-app-bar>
-      <!-- ✅ Background image added here -->
+      <!-- Background image added here -->
       <v-main
         style="
           background-image: url('/images/bg-img.png');
@@ -43,7 +43,7 @@ function onClick() {
       </v-main>
 
       <v-footer class="font-weight-bold" color="green-darken-4" border app>
-        2025- Campus Quest</v-footer
+        Copyright © 2025 Campus Quest | All rights reserved.</v-footer
       >
     </v-app>
   </v-responsive>
