@@ -37,9 +37,7 @@ function onClick() {
           min-height: 100vh;
         "
       >
-        <v-container>
-          <slot name="content"></slot>
-        </v-container>
+        <slot name="content"></slot>
       </v-main>
 
       <v-footer class="font-weight-bold" color="green-darken-4" border app>
