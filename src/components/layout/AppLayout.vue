@@ -27,7 +27,9 @@ function onClick() {
         </v-container>
       </v-main>
 
-      <v-footer color="green-darken-4" border app> 2025- Campus Quest</v-footer>
+      <v-footer class="font-weight-bold" color="green-darken-4" border app>
+        2025- Campus Quest</v-footer
+      >
     </v-app>
   </v-responsive>
 </template>
