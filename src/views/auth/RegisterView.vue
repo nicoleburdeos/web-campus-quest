@@ -13,7 +13,7 @@ const { mobile } = useDisplay()
         <v-col cols="12" md="6" class="mx-auto pt-16">
           <v-card class="mx-auto" elevation="24">
             <v-card-title class="text-center">
-              <v-img src="/public/images/cq logo.png" :height="mobile ? '150' : '100'"></v-img>
+              <v-img src="/public/images/cq-logo.png" :height="mobile ? '150' : '100'"></v-img>
               <h2 class="font-weight-black">Campus Quest</h2>
               <p class="font-weight-bold">Registration Form</p>
             </v-card-title>
@@ -22,10 +22,12 @@ const { mobile } = useDisplay()
               <RegistrationForm></RegistrationForm>
 
               <v-divider class="my-5"></v-divider>
-              <h5 class="text-center">
+              <h4 class="text-center">
                 Already have an account?
-                <router-link class="text-primary" to="/login">Click here to login</router-link>
-              </h5>
+                <router-link class="text-green-darken-1 font-weight-black" to="/login"
+                  >Click here to login</router-link
+                >
+              </h4>
             </v-card-text>
           </v-card>
         </v-col>

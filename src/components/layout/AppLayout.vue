@@ -10,18 +10,33 @@ function onClick() {
 <template>
   <v-responsive class="border rounded">
     <v-app :theme="theme">
-      <v-app-bar class="px-3" color="green-darken-4">
+      <v-app-bar class="px-2" color="green-darken-4" height="100" app>
+        <v-img
+          src="/public/images/cq-logo-text.png"
+          max-height="500"
+          max-width="300"
+          class="mt-7"
+          contain
+        ></v-img>
         <v-spacer></v-spacer>
 
         <v-btn
-          :prepend-icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-          text="Toggle Theme"
+          :icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
+          variant="elevated"
+          color="green-darken-3"
           slim
           @click="onClick"
         ></v-btn>
       </v-app-bar>
-
-      <v-main>
+      <!-- ✅ Background image added here -->
+      <v-main
+        style="
+          background-image: url('/images/bg-img.png');
+          background-size: cover;
+          background-position: center;
+          min-height: 100vh;
+        "
+      >
         <v-container>
           <slot name="content"></slot>
         </v-container>
