@@ -10,10 +10,10 @@ const { mobile } = useDisplay()
   <AppLayout>
     <template #content>
       <v-row>
-        <v-col cols="12" md="6" class="mx-auto pt-16">
+        <v-col cols="10" md="6" class="mx-auto pt-16">
           <v-card class="mx-auto" elevation="24">
             <v-card-title class="text-center">
-              <v-img src="/public/images/cq-logo.png" :height="mobile ? '150' : '100'"></v-img>
+              <v-img src="/images/cq-logo.png" :height="mobile ? '150' : '100'"></v-img>
               <h2 class="font-weight-black">Campus Quest</h2>
               <p class="font-weight-bold">Login Form</p>
             </v-card-title>

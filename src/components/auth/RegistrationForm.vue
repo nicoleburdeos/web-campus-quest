@@ -1,5 +1,5 @@
 <script setup>
-import { requiredValidator, emailValidator } from '@/utils/validators'
+import { requiredValidator, emailValidator, confirmedValidator } from '@/utils/validators'
 import { ref } from 'vue'
 
 const formDataDefault = {
@@ -76,21 +76,13 @@ const onFormSubmit = () => {
           @click:append-inner="isPasswordConfirmVisible = !isPasswordConfirmVisible"
           :rules="[
             requiredValidator,
-            confirmedValidator(formData.password_confirmation, formData.password),
+            confirmedValidator(formData.password, formData.password_confirmation),
           ]"
         ></v-text-field>
       </v-col>
     </v-row>
 
-    <v-btn
-      class="mt-2"
-      type="submit"
-      color="red-darken-4"
-      prepend-icon="mdi-account-plus"
-      :disabled="formAction.formProcess"
-      :loading="formAction.formProcess"
-      block
-    >
+    <v-btn class="mt-2" type="submit" color="green-darken-4" prepend-icon="mdi-account-plus" block>
       Register
     </v-btn>
   </v-form>
