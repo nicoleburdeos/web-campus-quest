@@ -1,29 +1,36 @@
 <script setup>
-import {
-  requiredValidator,
-  emailValidator,
-  passwordValidator,
-  confirmedValidator,
-} from '@/utils/validators'
-import AlertNotification from '@/components/common/AlertNotification.vue'
-import { useRegister } from '@/composables/auth/register'
+import { requiredValidator, emailValidator } from '@/utils/validators'
 import { ref } from 'vue'
 
-const { formData, formAction, refVForm, onFormSubmit } = useRegister()
+const formDataDefault = {
+  firstname: '',
+  lastname: '',
+  email: '',
+  password: '',
+  password_confirmation: '',
+}
+
+const formData = ref({ ...formDataDefault })
 
 const isPasswordVisible = ref(false)
 const isPasswordConfirmVisible = ref(false)
+const refVForm = ref()
+
+const onSubmit = () => {
+  alert(formData.value.email)
+}
+
+const onFormSubmit = () => {
+  refVForm.value.validate().then(({ valid }) => {
+    if (valid) onSubmit()
+  })
+}
 </script>
 
 <template>
-  <AlertNotification
-    :form-success-message="formAction.formSuccessMessage"
-    :form-error-message="formAction.formErrorMessage"
-  ></AlertNotification>
-
   <v-form ref="refVForm" @submit.prevent="onFormSubmit">
-    <v-row dense>
-      <v-col cols="12" sm="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <v-text-field
           v-model="formData.firstname"
           label="Firstname"
