@@ -70,6 +70,7 @@ const onFormSubmit = () => {
       <v-col cols="12" sm="6">
         <v-text-field
           v-model="formData.password_confirmation"
+          prepend-inner-icon="mdi-lock-outline"
           label="Password Confirmation"
           :type="isPasswordConfirmVisible ? 'text' : 'password'"
           :append-inner-icon="isPasswordConfirmVisible ? 'mdi-eye-off' : 'mdi-eye'"
