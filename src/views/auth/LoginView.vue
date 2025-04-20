@@ -17,7 +17,7 @@ const { mobile } = useDisplay()
               <h2 class="font-weight-black">Campus Quest</h2>
               <p class="font-weight-bold">Login Form</p>
             </v-card-title>
-            <v-card-text class="pt-4">
+            <v-card-text class="pt-2">
               <v-divider class="my-5"></v-divider>
               <LoginForm />
               <v-divider class="my-5"></v-divider>
