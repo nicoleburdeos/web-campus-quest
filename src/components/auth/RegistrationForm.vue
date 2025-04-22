@@ -6,6 +6,7 @@ const formDataDefault = {
   firstname: '',
   lastname: '',
   email: '',
+  phone: '',
   password: '',
   password_confirmation: '',
 }
@@ -51,7 +52,20 @@ const onFormSubmit = () => {
           v-model="formData.email"
           label="Email"
           prepend-inner-icon="mdi-email-outline"
+          type="email"
+          :placeholder="'xxxx@sample.com '"
           :rules="[requiredValidator, emailValidator]"
+        ></v-text-field>
+      </v-col>
+
+      <v-col cols="12">
+        <v-text-field
+          v-model="formData.phone"
+          label="Phone Number"
+          type="phone"
+          prepend-inner-icon="mdi-phone-outline"
+          :placeholder="'(+63)9-1234-5678'"
+          :rules="[requiredValidator]"
         ></v-text-field>
       </v-col>
 
