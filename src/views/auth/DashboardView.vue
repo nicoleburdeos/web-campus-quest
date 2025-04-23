@@ -52,6 +52,7 @@ const nameRules = [v => !!v || 'This field is required']
                   value="newtask"
                   @click="showNewTask = true"
                 ></v-list-item>
+                <v-list-item prepend-icon="mdi-clipboard-text" title="Task Board" value="taskboard"></v-list-item>
                 <v-list-item prepend-icon="mdi-history" title="Recent Task" value="recentTask"></v-list-item>
                 <v-list-item prepend-icon="mdi-logout" title="Log Out" value="log out"></v-list-item>
               </v-list>
