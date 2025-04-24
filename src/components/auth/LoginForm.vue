@@ -41,10 +41,8 @@ const onFormSubmit = () => {
       :rules="[requiredValidator]"
     ></v-text-field>
 
-    <router-link to="/dashboard">
     <v-btn class="mt-2" type="submit" color="green-darken-4" prepend-icon="mdi-login" block>
       Login
     </v-btn>
-  </router-link>
   </v-form>
 </template>
