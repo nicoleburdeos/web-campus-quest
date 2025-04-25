@@ -6,7 +6,7 @@ const theme = ref('light')
 <template>
   <v-responsive class="border rounded">
     <v-app :theme="theme">
-      <v-app-bar class="px-2" color="green-darken-4" height="80" app>
+      <v-app-bar class="px-2" color="green-darken-4" height="90" app>
         <v-img
           src="/images/cq-logo-text.png"
           max-height="300"
