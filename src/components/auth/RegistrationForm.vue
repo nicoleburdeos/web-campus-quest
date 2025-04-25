@@ -1,25 +1,54 @@
 <script setup>
 import { requiredValidator, emailValidator, confirmedValidator } from '@/utils/validators'
 import { ref } from 'vue'
+import { supabase, formActionDefault } from '@/utils/supabase'
+import AlertNotification from '@/components/common/AlertNotification.vue'
 
 const formDataDefault = {
   firstname: '',
   lastname: '',
   email: '',
+  phone: '',
   password: '',
   password_confirmation: '',
 }
 
 const formData = ref({ ...formDataDefault })
+const formAction = ref({ ...formActionDefault })
 
 const isPasswordVisible = ref(false)
 const isPasswordConfirmVisible = ref(false)
 const refVForm = ref()
 
-const onSubmit = () => {
-  alert(formData.value.email)
-}
+const onSubmit = async () => {
+  formAction.value = { ...formActionDefault }
+  formAction.value.formProcess = true
 
+  const { data, error } = await supabase.auth.signUp({
+    email: formData.value.email,
+    password: formData.value.password,
+
+    options: {
+      data: {
+        firstname: formData.value.firstname,
+        lastname: formData.value.lastname,
+        phone: formData.value.phone,
+      },
+    },
+  })
+
+  if (error) {
+    console.log(error)
+    formAction.value.formErrorMessage = error.message
+    formAction.value.formStatus = error.status
+  } else if (data) {
+    console.log(data)
+    formAction.value.formSuccessMessage = 'Successfully Registered'
+    refVForm.value?.reset()
+  }
+
+  formAction.value.formProcess = false
+}
 const onFormSubmit = () => {
   refVForm.value.validate().then(({ valid }) => {
     if (valid) onSubmit()
@@ -28,7 +57,11 @@ const onFormSubmit = () => {
 </script>
 
 <template>
-  <v-form ref="refVForm" @submit.prevent="onFormSubmit">
+  <AlertNotification
+    :form-success-message="formAction.formSuccessMessage"
+    :form-error-message="formAction.formErrorMessage"
+  ></AlertNotification>
+  <v-form class="mt-5" ref="refVForm" @submit.prevent="onFormSubmit">
     <v-row>
       <v-col cols="12" md="6">
         <v-text-field
@@ -51,7 +84,20 @@ const onFormSubmit = () => {
           v-model="formData.email"
           label="Email"
           prepend-inner-icon="mdi-email-outline"
+          type="email"
+          :placeholder="'xxxx@sample.com '"
           :rules="[requiredValidator, emailValidator]"
+        ></v-text-field>
+      </v-col>
+
+      <v-col cols="12">
+        <v-text-field
+          v-model="formData.phone"
+          label="Phone Number"
+          type="phone"
+          prepend-inner-icon="mdi-phone-outline"
+          :placeholder="'(+63)9-1234-5678'"
+          :rules="[requiredValidator]"
         ></v-text-field>
       </v-col>
 
@@ -83,7 +129,15 @@ const onFormSubmit = () => {
       </v-col>
     </v-row>
 
-    <v-btn class="mt-2" type="submit" color="green-darken-4" prepend-icon="mdi-account-plus" block>
+    <v-btn
+      class="mt-2"
+      type="submit"
+      color="green-darken-4"
+      prepend-icon="mdi-account-plus"
+      block
+      :disabled="formAction.formProcess"
+      :loading="formAction.formProcess"
+    >
       Register
     </v-btn>
   </v-form>
