@@ -2,10 +2,6 @@
 import { ref } from 'vue'
 
 const theme = ref('light')
-
-// function onClick() {
-//   theme.value = theme.value === 'light' ? 'dark' : 'light'
-// }
 </script>
 <template>
   <v-responsive class="border rounded">
@@ -20,14 +16,6 @@ const theme = ref('light')
         ></v-img>
 
         <v-spacer></v-spacer>
-
-        <!-- <v-btn
-          :icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-          variant="elevated"
-          color="green-darken-3"
-          slim
-          @click="onClick"
-        ></v-btn> -->
       </v-app-bar>
       <!-- Background image added here -->
       <v-main
