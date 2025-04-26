@@ -4,7 +4,7 @@ import { ref } from 'vue'
 </script>
 
 <template>
-  <DashboardView>
+    <DashboardView>
     <v-container fluid>
       <v-row justify="center">
         <v-col cols="12" md="5">

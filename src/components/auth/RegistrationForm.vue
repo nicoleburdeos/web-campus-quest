@@ -3,6 +3,9 @@ import { requiredValidator, emailValidator, confirmedValidator } from '@/utils/v
 import { ref } from 'vue'
 import { supabase, formActionDefault } from '@/utils/supabase'
 import AlertNotification from '@/components/common/AlertNotification.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const formDataDefault = {
   firstname: '',
@@ -32,6 +35,7 @@ const onSubmit = async () => {
       data: {
         firstname: formData.value.firstname,
         lastname: formData.value.lastname,
+        phone: formData.value.phone,
       },
     },
   })
@@ -43,9 +47,12 @@ const onSubmit = async () => {
   } else if (data) {
     console.log(data)
     formAction.value.formSuccessMessage = 'Successfully Registered'
-    refVForm.value?.reset()
+    router.replace('/dashboard')
   }
 
+  //Reset Form
+  refVForm.value?.reset()
+  //Turn off processing
   formAction.value.formProcess = false
 }
 const onFormSubmit = () => {

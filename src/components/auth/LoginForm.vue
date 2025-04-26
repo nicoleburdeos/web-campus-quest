@@ -12,7 +12,7 @@ const formDataDefault = {
 
 const formData = ref({ ...formDataDefault })
 
-const onSubmit = () => {
+const onSubmit = async () => {
   alert(formData.value.email)
 }
 
@@ -41,7 +41,8 @@ const onFormSubmit = () => {
       :rules="[requiredValidator]"
     ></v-text-field>
 
-    <v-btn class="mt-2" type="submit" color="green-darken-4" prepend-icon="mdi-login" block  to="/dashboard"> Login
+    <v-btn class="mt-2" type="submit" color="green-darken-4" prepend-icon="mdi-login" block>
+      Login
     </v-btn>
   </v-form>
 </template>
