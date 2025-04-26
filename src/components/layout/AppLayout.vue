@@ -10,7 +10,7 @@ const theme = ref('light')
 <template>
   <v-responsive class="border rounded">
     <v-app :theme="theme">
-      <v-app-bar class="px-2" color="green-darken-4" height="100" app>
+      <v-app-bar class="px-2" color="transparent" elevation="0" height="100" app>
         <v-img
           src="/images/cq-logo-text.png"
           max-height="500"
@@ -40,7 +40,7 @@ const theme = ref('light')
         <slot name="content"></slot>
       </v-main>
 
-      <v-footer class="font-weight-bold" color="green-darken-4" border app>
+      <v-footer class="font-weight-bold" color="transparent" elevation="0" border app>
         Copyright © 2025 Campus Quest | All rights reserved.</v-footer
       >
     </v-app>

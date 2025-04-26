@@ -9,10 +9,10 @@ import AppLayout from '@/components/layout/AppLayout.vue'
         <v-row class="d-flex justify-center">
           <v-col cols="12" sm="11" md="10" lg="6" xl="5">
             <v-card class="pa-10 text-center transparent-card card-position" elevation="10">
-              <h2 class="text-h3 font-weight-bold mb-4 text-light-green-accent-3">
-                Welcome to
-                <span class="text-green-accent-4">Campus</span>
-                <span class="text-yellow-accent-2"> Quest!</span>
+              <h2 class="text-h3 font-weight-bold mb-4 rainbow-text">
+                <span class="welcome">Welcome to</span>
+                <span class="campus"> Campus</span>
+                <span class="quest"> Quest!</span>
               </h2>
 
               <p class="mb-6 text-body-1 text-white">
@@ -41,7 +41,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
   top: 0;
 }
 
-/* Adjust vertical position on desktop */
+
 @media (min-width: 992px) {
   .card-position {
     top: -50px;
@@ -59,5 +59,29 @@ import AppLayout from '@/components/layout/AppLayout.vue'
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 128, 0, 0.3);
   transition: all 0.3s ease;
+}
+.rainbow-text {
+  animation: rainbow-text 5s linear infinite;
+}
+
+.welcome {
+  animation: rainbow-text 5s linear infinite;
+}
+
+.campus {
+  animation: rainbow-text 5s linear infinite;
+  animation-delay: 0.5s;
+}
+
+.quest {
+  animation: rainbow-text 5s linear infinite;
+  animation-delay: 1s;
+}
+
+@keyframes rainbow-text {
+  0% { color: #00e676; }
+  33% { color: #00c853; }
+  66% { color: #ffd740; }
+  100% { color: #00e676; }
 }
 </style>
