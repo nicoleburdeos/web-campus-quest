@@ -1,7 +1,6 @@
 <script setup>
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { ref } from 'vue'
-
 </script>
 
 <template>
@@ -23,12 +22,30 @@ import { ref } from 'vue'
               <v-divider></v-divider>
 
               <v-list density="compact" nav>
-               
-              <v-list-item   prepend-icon="mdi-plus " title="New Task"  value="newtask" to="/new-task" ></v-list-item> 
+                <v-list-item
+                  prepend-icon="mdi-plus "
+                  title="New Task"
+                  value="newtask"
+                  to="/new-task"
+                ></v-list-item>
 
-                <v-list-item prepend-icon="mdi-clipboard-text" title="Task Board" value="taskboard" to="/task-board"></v-list-item>
-                <v-list-item prepend-icon="mdi-history" title="Recent Task" value="recentTask" to="/recent-task"></v-list-item>
-                <v-list-item prepend-icon="mdi-logout" title="Log Out" value="log out"></v-list-item>
+                <v-list-item
+                  prepend-icon="mdi-clipboard-text"
+                  title="Task Board"
+                  value="taskboard"
+                  to="/task-board"
+                ></v-list-item>
+                <v-list-item
+                  prepend-icon="mdi-history"
+                  title="Recent Task"
+                  value="recentTask"
+                  to="/recent-task"
+                ></v-list-item>
+                <v-list-item
+                  prepend-icon="mdi-logout"
+                  title="Log Out"
+                  value="log out"
+                ></v-list-item>
               </v-list>
             </v-navigation-drawer>
           </v-col>
