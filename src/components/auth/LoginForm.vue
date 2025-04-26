@@ -12,7 +12,7 @@ const formDataDefault = {
 
 const formData = ref({ ...formDataDefault })
 
-const onSubmit = () => {
+const onSubmit = async () => {
   alert(formData.value.email)
 }
 
