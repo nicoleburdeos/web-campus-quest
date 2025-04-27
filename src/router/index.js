@@ -42,13 +42,14 @@ const router = createRouter({
       path: '/recent-task',
       name: 'recent-task',
       component: RecentTaskView,
-    },
+    }
 
     {
       path: '/profile',
       name: 'profile',
       component: ProfileView,
-    },
+    }
+>>>88a8637a978a7be847e35be5
   ],
 })
 
