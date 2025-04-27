@@ -3,8 +3,9 @@ import LoginView from '@/views/auth/LoginView.vue'
 import RegisterView from '@/views/auth/RegisterView.vue'
 import DashboardView from '@/views/auth/DashboardView.vue'
 import NewView from '@/views/NewView.vue'
-import TaskBoardView from '@/views/auth/TaskBoardView.vue'
+import TaskBoardView from '@/views/auth/TaskboardView.vue'
 import RecentTaskView from '@/views/auth/RecentTaskView.vue'
+import ProfileView from '@/views/auth/ProfileView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,6 +44,11 @@ const router = createRouter({
       component: RecentTaskView,
     },
 
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ProfileView,
+    },
   ],
 })
 

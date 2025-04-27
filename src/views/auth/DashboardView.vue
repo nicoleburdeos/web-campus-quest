@@ -14,12 +14,14 @@ import { ref } from 'vue'
             <v-navigation-drawer color="green-darken-4" expand-on-hover rail app>
               <v-list>
                 <v-list-item
-                  prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"
+                  prepend-avatar="public/images/cq-logo.png"
                   subtitle="sandra_a88@gmailcom"
-                  title="Sandra Adams"
+                  title="AMPUS QUEST"
                 ></v-list-item>
+
               </v-list>
 
+              
               <v-divider></v-divider>
 
               <v-list density="compact" nav>
@@ -28,6 +30,7 @@ import { ref } from 'vue'
 
                 <v-list-item prepend-icon="mdi-clipboard-text" title="Task Board" value="taskboard" to="/task-board"></v-list-item>
                 <v-list-item prepend-icon="mdi-history" title="Recent Task" value="recentTask" to="/recent-task"></v-list-item>
+                <v-list-item prepend-icon="mdi-account" title="Profile" value="profile" to="/profile"></v-list-item>
                 <v-list-item prepend-icon="mdi-logout" title="Log Out" value="log out"></v-list-item>
               </v-list>
             </v-navigation-drawer>

@@ -1,8 +1,6 @@
 <script setup>
 import DashboardView from './DashboardView.vue'
 import { ref } from 'vue'
-
-const items = Array.from({ length: 6 }, (k, v) => v + 1)
 </script>
 
 <template>
@@ -15,38 +13,11 @@ const items = Array.from({ length: 6 }, (k, v) => v + 1)
             <v-card class="mx-auto glass-card" elevation="0">
               <v-img src="/images/cq-logo.png" :height="mobile ? '100' : '70'"></v-img>
               <v-card-title class="text-center">
-                <h3 class="font-weight-black">Task Board</h3>
+                <h3 class="font-weight-black">Profile</h3>
               </v-card-title>
               <!-- Example placeholder for tasks -->
               <v-card-text>
-                <v-virtual-scroll
-      :items="items"
-      height="320"
-      item-height="20"
-    >
-  
-      <template v-slot:default="{ item }">
-        <v-list-item
-          :subtitle="`Badge #${item}`"
-          :title="'Task Name'"
-        > 
-          <template v-slot:prepend>
-            <v-icon class="bg-primary">mdi-account</v-icon>
-          </template>
-
-          <template v-slot:append>
-            <v-btn
-              icon="mdi-open-in-new"
-              size="x-small"
-              variant="tonal"
-            ></v-btn>
-          </template>
-        </v-list-item>
-        <v-divider></v-divider>
-        <br>
-      </template>
-     
-    </v-virtual-scroll>
+                <div class="text-center">No tasks to display.</div>
               </v-card-text>
             </v-card>
           </v-col>
