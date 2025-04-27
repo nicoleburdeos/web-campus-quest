@@ -1,13 +1,17 @@
 <script setup>
 import DashboardView from './auth/DashboardView.vue'
 import { ref } from 'vue'
-
 </script>
 
 <template>
-    <DashboardView>
+  <DashboardView>
     <v-container fluid>
-      <v-row justify="center">
+      <v-row justify="center" align="center">
+        <!-- Left: Poster Image (hide pag mobile) -->
+        <v-col cols="12" md="6" class="d-flex justify-center d-none d-md-flex">
+          <v-img src="/images/img-poster.gif" height="350" max-width="350" class="mx-auto"></v-img>
+        </v-col>
+        <!-- Right: New Task Form -->
         <v-col cols="12" md="5">
           <v-card class="mx-auto glass-card" elevation="0">
             <v-img src="/images/cq-logo.png" height="70"></v-img>
@@ -56,11 +60,11 @@ import { ref } from 'vue'
                       ></v-select>
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-text-field
-                        label="Quantity"
-                        model-value="1"
-                        variant="outlined"
-                      ></v-text-field>
+                      <v-number-input
+                      label="Quantity"
+          control-variant="split"
+          inset
+        ></v-number-input>
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-text-field
@@ -70,9 +74,7 @@ import { ref } from 'vue'
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" class="text-center">
-                      <v-btn prepend-icon="mdi-check" color="green-darken-4">
-                        Submit
-                      </v-btn>
+                      <v-btn prepend-icon="mdi-check" color="green-darken-4"> Submit </v-btn>
                     </v-col>
                   </v-row>
                 </v-container>

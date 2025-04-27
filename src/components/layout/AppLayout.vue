@@ -24,7 +24,7 @@ const theme = ref('light')
         <slot name="content"></slot>
       </v-main>
 
-      <v-footer class="font-weight-bold" color="transparent" elevation="0" border app>
+      <v-footer class="font-weight-bold" color="transparent" elevation="0" border app >
         Copyright © 2025 Campus Quest | All rights reserved.</v-footer
       >
     </v-app>
