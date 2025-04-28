@@ -1,6 +1,9 @@
 <script setup>
 import DashboardView from './auth/DashboardView.vue'
 import { ref } from 'vue'
+import { useDisplay } from 'vuetify'
+
+const { mobile } = useDisplay()
 </script>
 
 <template>
@@ -9,7 +12,12 @@ import { ref } from 'vue'
       <v-row justify="center" align="center">
         <!-- Left: Poster Image (hide pag mobile) -->
         <v-col cols="12" md="6" class="d-flex justify-center d-none d-md-flex">
-          <v-img src="/images/img-poster.gif" height="350" max-width="350" class="mx-auto"></v-img>
+          <v-img
+            src="/images/img-poster.gif"
+            :height="mobile ? '200' : '350'"
+            :max-width="mobile ? '200' : '350'"
+            class="mx-auto"
+          ></v-img>
         </v-col>
         <!-- Right: New Task Form -->
         <v-col cols="12" md="5">
@@ -61,10 +69,10 @@ import { ref } from 'vue'
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-number-input
-                      label="Quantity"
-          control-variant="split"
-          inset
-        ></v-number-input>
+                        label="Quantity"
+                        control-variant="split"
+                        inset
+                      ></v-number-input>
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-text-field
