@@ -60,6 +60,13 @@ const drawer = ref(true)
                   value="recentTask"
                   to="/recent-task"
                 ></v-list-item>
+
+                <v-list-item
+                  prepend-icon="mdi-account"
+                  title="Personal Account"
+                  value="personalAccount"
+                  to="/profile"
+                ></v-list-item>
                 <v-list-item
                   prepend-icon="mdi-logout"
                   title="Log Out"

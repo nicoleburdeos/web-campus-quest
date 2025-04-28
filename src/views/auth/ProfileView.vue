@@ -1,46 +1,93 @@
 <script setup>
 import DashboardView from './DashboardView.vue'
 import { ref } from 'vue'
+
 </script>
 
 <template>
   <DashboardView>
     <v-container fluid>
-      <v-main>
-        <!-- Add your Task Board content here -->
-        <div class="main-content">
-          <v-col cols="12" md="6" lg="6">
-            <v-card class="mx-auto glass-card" elevation="0">
-              <v-img src="/images/cq-logo.png" :height="mobile ? '100' : '70'"></v-img>
-              <v-card-title class="text-center">
-                <h3 class="font-weight-black">Profile</h3>
-              </v-card-title>
-              <!-- Example placeholder for tasks -->
-              <v-card-text>
-                <div class="text-center">No tasks to display.</div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </div>
-      </v-main>
+      <v-row>
+        <v-col cols="12">
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-card class="profile-card pa-6" elevation="1">
+            <v-row>
+              <!-- Left side and Basic Info -->
+              <v-col cols="12" md="3" class="d-flex flex-column align-center justify-center">
+                <v-avatar size="100" class="mb-3">
+                  <v-img src="/images/cq-logo.png" alt="User avatar"></v-img>
+                </v-avatar>
+                <div class="text-h6 font-weight-bold mb-1">Jannie Regel</div>
+                <div class="mb-1">
+                  <v-rating value="5" color="amber" dense readonly size="18"></v-rating>
+                  <span class="ml-1 grey--text text--darken-1">214 rates</span>
+                </div>
+                <v-progress-linear
+                  value="85"
+                  height="8"
+                  color="primary"
+                  rounded
+                  class="mb-1"
+                ></v-progress-linear>
+                <div class="caption grey--text">85% trust</div>
+              </v-col>
+              <v-divider vertical></v-divider>
+              <!-- Right side Details -->
+              <v-col cols="12" md="9">
+                <v-row>
+                  <!-- User profile -->
+                  <v-col cols="12" md="12" class="pb-0">
+                    <div class="font-weight-bold mb-2"><h2>User profile</h2></div> 
+         
+                    <br><br>
+    
+
+                    <v-row>
+                      <v-col cols="4"
+                        ><span class="text-medium-emphasis py-1 px-0">Email:</span>
+                        <span class="font-weight-bold mb-2"> evangelistajosh@gmailcom</span></v-col
+                      >
+
+                      <v-col cols="4"
+                        ><span class="text-medium-emphasis py-1 px-0">Gender:</span>
+                        <span class="font-weight-bold mb-2"> Female</span></v-col
+                      >
+                 
+                      <v-col cols="4"
+                        ><span class="text-medium-emphasis py-1 px-0">Mobile Number:</span>
+                        <span class="font-weight-bold mb-2"> 091134325</span></v-col
+                      >
+                    </v-row>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
   </DashboardView>
 </template>
 
 <style scoped>
-.glass-card {
-  background: rgba(255, 255, 255, 0.15); /* Light glass effect */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+.profile-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  margin-top: 1rem;
+  letter-spacing: -1px;
 }
-
-.v-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 128, 0, 0.3);
-  transition: all 0.3s ease;
+.profile-card {
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(60, 60, 60, 0.07);
+}
+.profile-link {
+  color: #1976d2;
+  cursor: pointer;
+  text-decoration: underline;
 }
 </style>
