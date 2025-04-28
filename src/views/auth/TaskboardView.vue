@@ -44,7 +44,10 @@ const toggleValue = ref(false)
                             <template v-slot:default="{ isActive }">
                               <v-card rounded="lg">
                                 <v-card-title class="d-flex justify-space-between align-center">
-                                  <div class="text-h5 text-medium-emphasis ps-2">Task Info</div>
+                                  <div class="d-flex align-center">
+                                    <v-icon class="me-2">mdi-information</v-icon>
+                                    <div class="text-h5 text-medium-emphasis ps-2">Task Info</div>
+                                  </div>
                                   <v-btn
                                     icon="mdi-close"
                                     variant="text"
@@ -145,7 +148,12 @@ const toggleValue = ref(false)
                             <template v-slot:default="{ isActive }">
                               <v-card rounded="lg">
                                 <v-card-title class="d-flex justify-space-between align-center">
-                                  <div class="text-h5 text-medium-emphasis ps-2">Personal Info</div>
+                                  <div class="d-flex align-center">
+                                    <v-icon class="me-2">mdi-information</v-icon>
+                                    <div class="text-h5 text-medium-emphasis ps-2">
+                                      Personal Info
+                                    </div>
+                                  </div>
                                   <v-btn
                                     icon="mdi-close"
                                     variant="text"
@@ -154,10 +162,16 @@ const toggleValue = ref(false)
                                 </v-card-title>
                                 <v-divider class="mb-4"></v-divider>
                                 <v-card-text>
-                                  <div class="text-medium-emphasis mb-4">
-                                    <h1>Name: Cj Dumags</h1>
+                                  <div class="d-flex align-center mb-4">
+                                    <v-avatar size="64" class="mr-4">
+                                      <v-img src="/images/img-poster.gif" alt="User avatar"></v-img>
+                                    </v-avatar>
+                                    <div>
+                                      <div class="text-medium-emphasis mb-2">
+                                        <h1 class="mb-0">Name: Cj Dumags</h1>
+                                      </div>
+                                    </div>
                                   </div>
-                  
                                   <br />
                                   <v-row class="tight-row">
                                     <v-col cols="6" class="text-medium-emphasis py-1 px-0"
@@ -169,15 +183,9 @@ const toggleValue = ref(false)
                                       >Ratings</v-col
                                     >
                                     <v-col cols="6" class="py-1 px-0">10/10</v-col>
-
-                                    
-                             
-
                                   </v-row>
 
                                   <br />
-
-                                
                                 </v-card-text>
                                 <v-divider class="mt-2"></v-divider>
                                 <v-card-actions class="my-2 d-flex justify-end">
