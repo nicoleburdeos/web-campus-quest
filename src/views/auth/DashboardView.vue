@@ -22,14 +22,13 @@ const drawer = ref(true)
             >
               <v-icon>{{ drawer ? 'mdi-close' : 'mdi-menu' }}</v-icon>
             </v-btn>
-<br>
+            <br />
             <v-navigation-drawer
               v-model="drawer"
               color="green-darken-4"
-              expand-on-hover
-              rail
-              app
               :temporary="$vuetify.display.smAndDown"
+              :width="$vuetify.display.smAndDown ? '250' : undefined"
+              class="mx-auto"
             >
               <v-list>
                 <v-list-item
