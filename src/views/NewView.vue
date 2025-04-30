@@ -76,7 +76,8 @@ const { mobile } = useDisplay()
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-text-field
-                        label="Price"
+                        hint="Minimum of Php 5.00"
+                        label="Service Fee"
                         model-value="Php "
                         variant="outlined"
                       ></v-text-field>
