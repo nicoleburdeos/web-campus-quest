@@ -1,6 +1,9 @@
 <script setup>
 import DashboardView from './DashboardView.vue'
 import { ref } from 'vue'
+import { useDisplay } from 'vuetify'
+
+const { mobile } = useDisplay()
 
 const items = Array.from({ length: 6 }, (k, v) => v + 1)
 const requestItems = Array.from({ length: 4 }, (k, v) => v + 1) // Example for requests
@@ -92,7 +95,7 @@ const toggleValue = ref(false)
                                     <v-col cols="6" class="py-1 px-0">1</v-col>
 
                                     <v-col cols="6" class="text-medium-emphasis py-1 px-0"
-                                      >Price:</v-col
+                                      >Service Fee:</v-col
                                     >
                                     <v-col cols="6" class="py-1 px-0">Php 12.00</v-col>
                                   </v-row>
