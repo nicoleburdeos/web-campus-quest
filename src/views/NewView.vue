@@ -28,50 +28,52 @@ const rules = {
   price: (v) => (v && v >= 5) || 'Minimum price is Php 5.00',
 }
 
-// Submit form
+// Submit form to Supabase
 const handleSubmit = async () => {
-  const { valid } = await form.value.validate()
-  if (!valid) {
-    errorMessage.value = 'Please fill in all required fields'
-    return
-  }
-
-  // Check for empty fields
-  const emptyFields = Object.entries(formData.value).filter(([key, value]) => {
-    return !value && key !== 'quantity' // Exclude quantity as it defaults to 1
-  })
-
-  if (emptyFields.length > 0) {
-    errorMessage.value = 'Please fill in all required fields'
-    return
-  }
-
-  loading.value = true
-  errorMessage.value = ''
-
   try {
+    loading.value = true
+
+    // Get current user
     const {
       data: { user },
+      error: userError,
     } = await supabase.auth.getUser()
+    if (userError) throw userError
 
-    const { error } = await supabase.from('tasks').insert({
+    // Format the data
+    const taskData = {
       user_id: user.id,
       task_name: formData.value.taskName,
       pickup_point: formData.value.pickupPoint,
       destination: formData.value.destination,
       task_type: formData.value.taskType,
       payment_method: formData.value.paymentMethod,
-      quantity: formData.value.quantity,
-      price: formData.value.serviceFee,
+      quantity: parseInt(formData.value.quantity),
+      price: parseFloat(formData.value.price),
       status: 'pending',
-    })
+      created_at: new Date().toISOString(),
+    }
+
+    // Insert into Supabase
+    const { error } = await supabase.from('tasks').insert([taskData])
 
     if (error) throw error
 
-    // Redirect to task board on success
+    // Clear form on success
+    formData.value = {
+      taskName: '',
+      pickupPoint: '',
+      destination: '',
+      taskType: '',
+      paymentMethod: '',
+      quantity: 1,
+      price: '',
+    }
+
+    // Redirect to task board
     router.push('/task-board')
   } catch (error) {
-    errorMessage.value = error.message
+    errorMessage.value = error.message || 'An error occurred while saving the task'
   } finally {
     loading.value = false
   }
@@ -99,7 +101,7 @@ const handleSubmit = async () => {
               <h3 class="font-weight-black">New Task</h3>
             </v-card-title>
             <v-card-text>
-              <v-form @submit.prevent="handleSubmit"></v-form>
+              <v-form ref="form" @submit.prevent="handleSubmit"></v-form>
               <v-alert v-if="errorMessage" type="error" variant="tonal" closable class="mb-4">
                 {{ errorMessage }}
               </v-alert>
