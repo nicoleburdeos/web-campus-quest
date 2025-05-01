@@ -6,6 +6,7 @@ import NewView from '@/views/NewView.vue'
 import TaskBoardView from '@/views/auth/TaskboardView.vue'
 import RecentTaskView from '@/views/auth/RecentTaskView.vue'
 import ProfileView from '@/views/auth/ProfileView.vue'
+import NotFoundView from '@/views/error/NotFoundView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,7 +50,14 @@ const router = createRouter({
       name: 'profile',
       component: ProfileView,
     },
+
+    {
+      path: '/not-found',
+      name: 'not-found',
+      component: NotFoundView,
+    },
   ],
 })
 
 export default router
+
