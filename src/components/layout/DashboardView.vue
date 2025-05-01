@@ -2,13 +2,25 @@
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/utils/supabase'
+import { useRouter } from 'vue-router'
 
 const drawer = ref(true)
+const router = useRouter()
 
 const userData = ref ({
   email: '',
   fullname: ' '
 })
+
+// Logout Functionality 
+const onLogout = async () => {
+  const { error } = await supabase.auth.signOut()
+  if (error) {
+    console.error('Error during logout:', error)
+    return
+  }
+  router.replace('/')
+}
 
 // Getting User Information Functionality
 const getUser = async () => {
@@ -93,6 +105,7 @@ onMounted(() => {
                   prepend-icon="mdi-logout"
                   title="Log Out"
                   value="log out"
+                  @click="onLogout"
                 ></v-list-item>
               </v-list>
             </v-navigation-drawer>
