@@ -8,12 +8,12 @@ import SideNavbarView from './SideNavbarView.vue'
 const drawer = ref(true)
 const router = useRouter()
 
-const userData = ref ({
+const userData = ref({
   email: '',
-  fullname: ' '
+  fullname: ' ',
 })
 
-// Logout Functionality 
+// Logout Functionality
 const onLogout = async () => {
   const { error } = await supabase.auth.signOut()
   if (error) {
@@ -25,10 +25,10 @@ const onLogout = async () => {
 
 // Getting User Information Functionality
 const getUser = async () => {
-  const { 
+  const {
     data: {
-      user: { user_metadata: metadata }
-    } 
+      user: { user_metadata: metadata },
+    },
   } = await supabase.auth.getUser()
 
   userData.value.email = metadata.email
@@ -58,7 +58,7 @@ onMounted(() => {
               <v-icon>{{ drawer ? 'mdi-close' : 'mdi-menu' }}</v-icon>
             </v-btn>
             <br />
-            <SideNavbarView></SideNavbarView>
+            <SideNavbarView :onLogout="onLogout" :userData="userData"></SideNavbarView>
           </v-col>
 
           <v-main>
