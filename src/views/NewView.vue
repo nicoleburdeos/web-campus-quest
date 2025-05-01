@@ -1,5 +1,5 @@
 <script setup>
-import DashboardView from './auth/DashboardView.vue'
+import DashboardView from '../components/layout/DashboardView.vue'
 import { ref } from 'vue'
 import { useDisplay } from 'vuetify'
 import { supabase } from '@/utils/supabase'

@@ -1,8 +1,30 @@
 <script setup>
 import AppLayout from '@/components/layout/AppLayout.vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { supabase } from '@/utils/supabase'
 
 const drawer = ref(true)
+
+const userData = ref ({
+  email: '',
+  fullname: ' '
+})
+
+// Getting User Information Functionality
+const getUser = async () => {
+  const { 
+    data: {
+      user: { user_metadata: metadata }
+    } 
+  } = await supabase.auth.getUser()
+
+  userData.value.email = metadata.email
+  userData.value.fullname = metadata.firstname + ' ' + metadata.lastname
+}
+
+onMounted(() => {
+  getUser()
+})
 </script>
 
 <template>
@@ -34,8 +56,8 @@ const drawer = ref(true)
               <v-list>
                 <v-list-item
                   prepend-avatar="public/images/cq-logo.png"
-                  subtitle="sandra_a88@gmailcom"
-                  title="AMPUS QUEST"
+                  :subtitle="userData.email"
+                  title="CAMPUS QUEST"
                 ></v-list-item>
               </v-list>
 
