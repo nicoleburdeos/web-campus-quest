@@ -7,6 +7,7 @@ import TaskBoardView from '@/views/auth/TaskboardView.vue'
 import RecentTaskView from '@/views/auth/RecentTaskView.vue'
 import ProfileView from '@/views/auth/ProfileView.vue'
 import NotFoundView from '@/views/error/NotFoundView.vue'
+import SideNavbarView from '@/components/layout/SideNavbarView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,8 +57,13 @@ const router = createRouter({
       name: 'not-found',
       component: NotFoundView,
     },
+
+    {
+      path: '/side-navbar',
+      name: 'side-navbar',
+      component: SideNavbarView,
+    },
   ],
 })
 
 export default router
-

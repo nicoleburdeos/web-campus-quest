@@ -1,15 +1,13 @@
 <script setup>
 import DashboardView from '../../components/layout/DashboardView.vue'
 import { ref } from 'vue'
-
 </script>
 
 <template>
   <DashboardView>
     <v-container fluid>
       <v-row>
-        <v-col cols="12">
-        </v-col>
+        <v-col cols="12"> </v-col>
       </v-row>
       <v-row>
         <v-col cols="12">
@@ -40,10 +38,9 @@ import { ref } from 'vue'
                 <v-row>
                   <!-- User profile -->
                   <v-col cols="12" md="12" class="pb-0">
-                    <div class="font-weight-bold mb-2"><h2>User profile</h2></div> 
-         
-                    <br><br>
-    
+                    <div class="font-weight-bold mb-2"><h2>User profile</h2></div>
+
+                    <br /><br />
 
                     <v-row>
                       <v-col cols="4"
@@ -55,7 +52,7 @@ import { ref } from 'vue'
                         ><span class="text-medium-emphasis py-1 px-0">Gender:</span>
                         <span class="font-weight-bold mb-2"> Female</span></v-col
                       >
-                 
+
                       <v-col cols="4"
                         ><span class="text-medium-emphasis py-1 px-0">Mobile Number:</span>
                         <span class="font-weight-bold mb-2"> 091134325</span></v-col
