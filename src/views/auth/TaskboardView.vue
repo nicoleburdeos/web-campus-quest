@@ -1,12 +1,34 @@
 <script setup>
 import DashboardView from '../../components/layout/DashboardView.vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useDisplay } from 'vuetify'
+import { supabase } from '@/utils/supabase'
 
 const { mobile } = useDisplay()
-const currentTab = ref(0) // Add this to track active tab
+const currentTab = ref(0)
 
-const items = Array.from({ length: 6 }, (k, v) => v + 1)
+const tasks = ref([])
+const loading = ref(false)
+const error = ref('')
+
+// Fetch tasks from Supabase
+const fetchTasks = async () => {
+  loading.value = true
+  error.value = ''
+  const { data, error: fetchError } = await supabase
+    .from('tasks')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (fetchError) {
+    error.value = fetchError.message
+  } else {
+    tasks.value = data
+  }
+  loading.value = false
+}
+
+onMounted(fetchTasks)
+
 const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
 </script>
 
@@ -18,24 +40,31 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
           <v-col cols="12" md="6" lg="6">
             <v-card class="mx-auto glass-card" elevation="0">
               <v-img src="/images/cq-logo.png" :height="mobile ? '100' : '70'"></v-img>
-
-              <!-- Replace toggle switch with tabs -->
               <v-tabs v-model="currentTab" color="green-darken-4" align-tabs="center" grow>
                 <v-tab :value="0">Task Quest</v-tab>
                 <v-tab :value="1">Task Requests</v-tab>
               </v-tabs>
-
               <v-card-text>
                 <v-window v-model="currentTab">
                   <!-- Task Quest Tab -->
                   <v-window-item :value="0">
-                    <v-virtual-scroll :items="items" height="320" item-height="20">
-                      <template v-slot:default="{ item }">
-                        <v-list-item :subtitle="`Badge #${item}`" :title="'Task Name'">
-                          <template v-slot:prepend>
+                    <v-progress-circular
+                      v-if="loading"
+                      indeterminate
+                      color="green-darken-4"
+                      class="mx-auto"
+                    />
+                    <v-alert v-if="error" type="error" class="mb-2">{{ error }}</v-alert>
+                    <v-list v-if="!loading && tasks.length" class="transparent-list">
+                      <template v-for="task in tasks" :key="task.id">
+                        <v-list-item
+                          :title="task.task_name"
+                          :subtitle="`${new Date(task.created_at).toLocaleTimeString()}`"
+                        >
+                          <template #prepend>
                             <v-icon>mdi-account</v-icon>
                           </template>
-                          <template v-slot:append>
+                          <template #append>
                             <v-btn icon variant="plain" size="small" class="info-btn">
                               <v-icon>mdi-information</v-icon>
                               <v-dialog activator="parent" max-width="500">
@@ -57,48 +86,55 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                     <v-divider class="mb-4"></v-divider>
                                     <v-card-text>
                                       <div class="text-medium-emphasis mb-4">
-                                        <h1>Task Name: Pancake</h1>
+                                        <h1>Task Name: {{ task.task_name }}</h1>
                                       </div>
-                                      <div class="mb-2">Task ID: #1233</div>
+                                      <div class="mb-2">Task ID: #{{ task.id }}</div>
 
-                                      <div class="text-medium-emphasis mb-1">
-                                        User Name: Josh Evangelista
-                                      </div>
                                       <br />
                                       <v-row class="tight-row">
-                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0"
-                                          >Pickup point:</v-col
+                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0">
+                                          Pickup point:
+                                        </v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{
+                                          task.pickup_point
+                                        }}</v-col>
+                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0">
+                                          Destination:
+                                        </v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{
+                                          task.destination
+                                        }}</v-col>
+                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0">
+                                          Task Type:
+                                        </v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{
+                                          task.task_type
+                                        }}</v-col>
+                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0">
+                                          Payment Method:
+                                        </v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{
+                                          task.payment_method
+                                        }}</v-col>
+                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0">
+                                          Quantity:
+                                        </v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{
+                                          task.quantity
+                                        }}</v-col>
+                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0">
+                                          Service Fee:
+                                        </v-col>
+                                        <v-col cols="6" class="py-1 px-0"
+                                          >Php {{ task.service_fee }}</v-col
                                         >
-                                        <v-col cols="6" class="py-1 px-0">Kinaadman Bldg.</v-col>
 
-                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0"
-                                          >Destination:</v-col
-                                        >
-                                        <v-col cols="6" class="py-1 px-0">Hiraya Bldg.</v-col>
-
-                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0"
-                                          >Task Type:</v-col
-                                        >
-                                        <v-col cols="6" class="py-1 px-0">Food Delivery</v-col>
-
-                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0"
-                                          >Payment Method:</v-col
-                                        >
-                                        <v-col cols="6" class="py-1 px-0">Cash On Delivery</v-col>
-
-                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0"
-                                          >Quantity:</v-col
-                                        >
-                                        <v-col cols="6" class="py-1 px-0">1</v-col>
-
-                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0"
-                                          >Service Fee:</v-col
-                                        >
-                                        <v-col cols="6" class="py-1 px-0">Php 12.00</v-col>
+                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0">
+                                          Status:
+                                        </v-col>
+                                        <v-col cols="6" class="py-1 px-0"> {{ task.status }}</v-col>
                                       </v-row>
-
                                       <br />
-
                                       <div class="mb-2">Message (optional)</div>
                                       <v-textarea
                                         :counter="300"
@@ -106,7 +142,10 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                         rows="2"
                                         variant="outlined"
                                         persistent-counter
-                                      ></v-textarea>
+                                        readonly
+                                          :model-value="task.message"
+                                      >
+                                      </v-textarea>
                                     </v-card-text>
                                     <v-divider class="mt-2"></v-divider>
                                     <v-card-actions class="my-2 d-flex justify-end">
@@ -134,9 +173,11 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                         <v-divider></v-divider>
                         <br />
                       </template>
-                    </v-virtual-scroll>
+                    </v-list>
+                    <div v-if="!loading && !tasks.length" class="text-center">
+                      No tasks to display.
+                    </div>
                   </v-window-item>
-
                   <!-- Task Requests Tab -->
                   <v-window-item :value="1">
                     <v-virtual-scroll :items="requestItems" height="320" item-height="20">
@@ -214,7 +255,6 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                   </v-card>
                                 </template>
                               </v-dialog>
-                              <!-- You can add a dialog here for requests if needed -->
                             </v-btn>
                           </template>
                         </v-list-item>
@@ -255,7 +295,6 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
   transition: all 0.3s ease;
 }
 
-/* Add these new styles for tabs */
 .v-tabs {
   margin-bottom: 16px;
 }
@@ -263,5 +302,10 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
 .v-tab {
   text-transform: none;
   font-weight: 600;
+}
+
+.transparent-list {
+  background: transparent !important;
+  box-shadow: none !important;
 }
 </style>

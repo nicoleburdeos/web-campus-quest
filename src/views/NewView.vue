@@ -8,15 +8,16 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const { mobile } = useDisplay()
 
-// Form data
+// Form data (match your Supabase column names)
 const formData = ref({
-  taskName: '',
-  pickupPoint: '',
+  task_name: '',
+  pickup_point: '',
   destination: '',
-  taskType: '',
-  paymentMethod: '',
+  task_type: '',
+  payment_method: '',
   quantity: 1,
-  price: '',
+  service_fee: '',
+  message: '',
 })
 
 const loading = ref(false)
@@ -26,6 +27,7 @@ const form = ref(null)
 const rules = {
   required: (v) => !!v || 'This field is required',
   serviceFee: (v) => (v && v >= 5) || 'Minimum price is Php 5.00',
+  quantity: (v) => (v && v > 0) || 'Quantity must be at least 1',
 }
 
 // Submit form to Supabase
@@ -43,13 +45,14 @@ const handleSubmit = async () => {
     // Format the data
     const taskData = {
       user_id: user.id,
-      task_name: formData.value.taskName,
-      pickup_point: formData.value.pickupPoint,
+      task_name: formData.value.task_name,
+      pickup_point: formData.value.pickup_point,
       destination: formData.value.destination,
-      task_type: formData.value.taskType,
-      payment_method: formData.value.paymentMethod,
+      task_type: formData.value.task_type,
+      payment_method: formData.value.payment_method,
       quantity: parseInt(formData.value.quantity),
-      price: parseFloat(formData.value.price),
+      service_fee: parseFloat(formData.value.service_fee),
+      message: formData.value.message,
       status: 'pending',
       created_at: new Date().toISOString(),
     }
@@ -61,13 +64,14 @@ const handleSubmit = async () => {
 
     // Clear form on success
     formData.value = {
-      taskName: '',
-      pickupPoint: '',
+      task_name: '',
+      pickup_point: '',
       destination: '',
-      taskType: '',
-      paymentMethod: '',
+      task_type: '',
+      payment_method: '',
       quantity: 1,
-      price: '',
+      service_fee: '',
+      message: '',
     }
 
     // Redirect to task board
@@ -101,17 +105,16 @@ const handleSubmit = async () => {
               <h3 class="font-weight-black">New Task</h3>
             </v-card-title>
             <v-card-text>
-              <v-form ref="form" @submit.prevent="handleSubmit"></v-form>
               <v-alert v-if="errorMessage" type="error" variant="tonal" closable class="mb-4">
                 {{ errorMessage }}
               </v-alert>
-              <v-form>
+              <v-form ref="form" @submit.prevent="handleSubmit">
                 <v-container>
                   <v-row>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="formData.taskName"
-                        :rules="[rules.required, pickupPoint]"
+                        v-model="formData.task_name"
+                        :rules="[rules.required]"
                         hint="For example, foods, school supplies, etc"
                         label="Task Name"
                         variant="underlined"
@@ -120,8 +123,8 @@ const handleSubmit = async () => {
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-text-field
-                        v-model="formData.pickupPoint"
-                        :rules="[rules.required, pickupPoint]"
+                        v-model="formData.pickup_point"
+                        :rules="[rules.required]"
                         hint="For example, Kinaadman Bldg, Hiraya Bldg , etc"
                         label="Pickup Point"
                         prepend-inner-icon="mdi-map-marker"
@@ -132,7 +135,7 @@ const handleSubmit = async () => {
                     <v-col cols="12" sm="6">
                       <v-text-field
                         v-model="formData.destination"
-                        :rules="[rules.required, destination]"
+                        :rules="[rules.required]"
                         hint="For example, Kinaadman Bldg, Hiraya Bldg , etc"
                         label="Destination"
                         prepend-inner-icon="mdi-map-marker"
@@ -142,8 +145,8 @@ const handleSubmit = async () => {
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-select
-                        v-model="formData.taskType"
-                        :rules="[rules.required, taskType]"
+                        v-model="formData.task_type"
+                        :rules="[rules.required]"
                         label="Task Type"
                         :items="['Food Delivery', 'Item Delivery', 'Ride Hailing']"
                         variant="outlined"
@@ -152,8 +155,8 @@ const handleSubmit = async () => {
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-select
-                        v-model="formData.paymentMethod"
-                        :rules="[rules.required, paymentMethod]"
+                        v-model="formData.payment_method"
+                        :rules="[rules.required]"
                         label="Payment Method"
                         :items="['G-cash', 'Cash On Delivery']"
                         variant="outlined"
@@ -161,37 +164,40 @@ const handleSubmit = async () => {
                       ></v-select>
                     </v-col>
                     <v-col cols="12" sm="6">
-                      <v-number-input
+                      <v-text-field
                         v-model="formData.quantity"
                         :rules="[rules.required, rules.quantity]"
                         label="Quantity"
-                        control-variant="split"
-                        inset
-                      ></v-number-input>
+                        type="number"
+                        min="1"
+                        variant="outlined"
+                        required
+                      ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-text-field
-                        v-model="formData.serviceFee"
+                        v-model="formData.service_fee"
                         :rules="[rules.required, rules.serviceFee]"
                         hint="Minimum of Php 5.00"
                         label="Service Fee"
                         prefix="Php "
                         variant="outlined"
                         min="5"
+                        type="number"
                         required
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12">
-                         <div class="mb-2">Message (optional)</div>
-                                      <v-textarea
-                                        :counter="300"
-                                        class="mb-2"
-                                        rows="2"
-                                        variant="outlined"
-                                        persistent-counter
-                                      ></v-textarea>
+                      <div class="mb-2">Message (optional)</div>
+                      <v-textarea
+                      v-model="formData.message"
+                        :counter="300"
+                        class="mb-2"
+                        rows="2"
+                        variant="outlined"
+                        persistent-counter
+                      ></v-textarea>
                     </v-col>
-
                     <v-col cols="12" class="text-center">
                       <v-btn
                         type="submit"
