@@ -25,7 +25,7 @@ const form = ref(null)
 
 const rules = {
   required: (v) => !!v || 'This field is required',
-  price: (v) => (v && v >= 5) || 'Minimum price is Php 5.00',
+  serviceFee: (v) => (v && v >= 5) || 'Minimum price is Php 5.00',
 }
 
 // Submit form to Supabase
