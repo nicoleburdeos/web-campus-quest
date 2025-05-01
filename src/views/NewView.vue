@@ -181,6 +181,17 @@ const handleSubmit = async () => {
                         required
                       ></v-text-field>
                     </v-col>
+                    <v-col cols="12">
+                         <div class="mb-2">Message (optional)</div>
+                                      <v-textarea
+                                        :counter="300"
+                                        class="mb-2"
+                                        rows="2"
+                                        variant="outlined"
+                                        persistent-counter
+                                      ></v-textarea>
+                    </v-col>
+
                     <v-col cols="12" class="text-center">
                       <v-btn
                         type="submit"
