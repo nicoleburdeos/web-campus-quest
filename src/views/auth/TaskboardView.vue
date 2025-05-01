@@ -73,9 +73,7 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                     <v-card-title class="d-flex justify-space-between align-center">
                                       <div class="d-flex align-center">
                                         <v-icon class="me-2">mdi-information</v-icon>
-                                        <div class="text-h5 text-medium-emphasis ps-2">
-                                          Task Info
-                                        </div>
+                                        <div class="text-h5 text-medium-emphasis ps-2">Task Info</div>
                                       </div>
                                       <v-btn
                                         icon="mdi-close"
@@ -107,9 +105,7 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0">
                                           Task Type:
                                         </v-col>
-                                        <v-col cols="6" class="py-1 px-0">{{
-                                          task.task_type
-                                        }}</v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{ task.task_type }}</v-col>
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0">
                                           Payment Method:
                                         </v-col>
@@ -119,9 +115,7 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0">
                                           Quantity:
                                         </v-col>
-                                        <v-col cols="6" class="py-1 px-0">{{
-                                          task.quantity
-                                        }}</v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{ task.quantity }}</v-col>
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0">
                                           Service Fee:
                                         </v-col>
@@ -143,9 +137,8 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                         variant="outlined"
                                         persistent-counter
                                         readonly
-                                          :model-value="task.message"
-                                      >
-                                      </v-textarea>
+                                        v-model="task.message"
+                                      ></v-textarea>
                                     </v-card-text>
                                     <v-divider class="mt-2"></v-divider>
                                     <v-card-actions class="my-2 d-flex justify-end">
@@ -171,7 +164,7 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                           </template>
                         </v-list-item>
                         <v-divider></v-divider>
-                        <br />
+                        <br>
                       </template>
                     </v-list>
                     <div v-if="!loading && !tasks.length" class="text-center">
