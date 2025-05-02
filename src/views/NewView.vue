@@ -24,14 +24,55 @@ const loading = ref(false)
 const errorMessage = ref('')
 const form = ref(null)
 
+// Modify the rules object
 const rules = {
-  required: (v) => !!v || 'This field is required',
-  serviceFee: (v) => (v && v >= 5) || 'Minimum price is Php 5.00',
-  quantity: (v) => (v && v > 0) || 'Quantity must be at least 1',
+  required: (v) => {
+    if (v === null || v === undefined || v === '') {
+      return 'This field is required'
+    }
+    return true
+  },
+  serviceFee: (v) => {
+    if (!v) return 'Service fee is required'
+    if (isNaN(v)) return 'Must be a valid number'
+    if (v < 5) return 'Minimum price is Php 5.00'
+    return true
+  },
+  quantity: (v) => {
+    if (!v) return 'Quantity is required'
+    if (isNaN(v)) return 'Must be a valid number'
+    if (v < 1) return 'Quantity must be at least 1'
+    return true
+  },
 }
 
-// Submit form to Supabase
+// Update the handleSubmit function
 const handleSubmit = async () => {
+  const { valid } = await form.value.validate()
+
+  if (!valid) {
+    errorMessage.value = 'Please fill in all required fields correctly'
+    return
+  }
+
+  // Check for empty required fields
+  const requiredFields = [
+    'task_name',
+    'pickup_point',
+    'destination',
+    'task_type',
+    'payment_method',
+    'quantity',
+    'service_fee',
+  ]
+
+  const emptyFields = requiredFields.filter((field) => !formData.value[field])
+
+  if (emptyFields.length > 0) {
+    errorMessage.value = `Please fill in all required fields: ${emptyFields.join(', ')}`
+    return
+  }
+
   try {
     loading.value = true
 
@@ -190,7 +231,7 @@ const handleSubmit = async () => {
                     <v-col cols="12">
                       <div class="mb-2">Message (optional)</div>
                       <v-textarea
-                      v-model="formData.message"
+                        v-model="formData.message"
                         :counter="300"
                         class="mb-2"
                         rows="2"
