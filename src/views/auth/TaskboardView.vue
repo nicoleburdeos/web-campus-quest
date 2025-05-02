@@ -8,6 +8,7 @@ const { mobile } = useDisplay()
 const currentTab = ref(0)
 
 const tasks = ref([])
+const requests = ref([])
 const loading = ref(false)
 const error = ref('')
 
@@ -27,7 +28,21 @@ const fetchTasks = async () => {
   loading.value = false
 }
 
-onMounted(fetchTasks)
+// Fetch requests from Supabase
+const fetchRequests = async () => {
+  loading.value = true
+  const { data, error: fetchError } = await supabase
+    .from('task_requests')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (!fetchError) requests.value = data
+  loading.value = false
+}
+
+onMounted(() => {
+  fetchTasks()
+  fetchRequests()
+})
 
 const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
 
@@ -37,26 +52,25 @@ const requestTask = async (task, isActive) => {
   } = await supabase.auth.getUser()
   if (!user) return
 
-  // Get info from user_metadata
   const fullname =
     `${user.user_metadata.firstname || ''} ${user.user_metadata.lastname || ''}`.trim()
   const phone = user.user_metadata.phone || ''
-  const ratings = user.user_metadata.ratings || 'N/A' // Adjust if you have ratings
+  const ratings = user.user_metadata.ratings || 'N/A'
 
-  // Update the task with requester info
-  const { error } = await supabase
-    .from('tasks')
-    .update({
-      requested_by: user.id || null,
-      requested_by_fullname: fullname || '',
-      requested_by_phone: phone || '',
-      requested_by_ratings: ratings || '',
-    })
-    .eq('id', task.id)
+  // Insert a new request for this task
+  const { error } = await supabase.from('task_requests').insert([
+    {
+      task_id: task.id,
+      user_id: user.id,
+      fullname,
+      phone,
+      ratings,
+    },
+  ])
 
   if (!error) {
     isActive.value = false
-    await fetchTasks()
+    await fetchRequests()
   }
 }
 </script>
@@ -210,14 +224,14 @@ const requestTask = async (task, isActive) => {
                   </v-window-item>
                   <!-- Task Requests Tab -->
                   <v-window-item :value="1">
-                    <v-list v-if="!loading && tasks.length" class="transparent-list">
-                      <template v-for="task in tasks.filter((t) => t.requested_by)" :key="task.id">
+                    <v-list v-if="!loading && requests.length" class="transparent-list">
+                      <template v-for="req in requests" :key="req.id">
                         <v-list-item
-                          :title="task.task_name"
-                          :subtitle="`${new Date(task.created_at).toLocaleTimeString()}`"
+                          :title="req.fullname"
+                          :subtitle="`${new Date(req.created_at).toLocaleTimeString()}`"
                         >
                           <template #prepend>
-                            <v-icon color="primary">mdi-account-question</v-icon>
+                            <v-icon>mdi-account</v-icon>
                           </template>
                           <template #append>
                             <v-btn icon variant="plain" size="small" class="info-btn">
@@ -229,7 +243,7 @@ const requestTask = async (task, isActive) => {
                                       <div class="d-flex align-center">
                                         <v-icon class="me-2">mdi-information</v-icon>
                                         <div class="text-h5 text-medium-emphasis ps-2">
-                                          Personal Info
+                                          Request Info
                                         </div>
                                       </div>
                                       <v-btn
@@ -240,55 +254,22 @@ const requestTask = async (task, isActive) => {
                                     </v-card-title>
                                     <v-divider class="mb-4"></v-divider>
                                     <v-card-text>
-                                      <div class="d-flex align-center mb-4">
-                                        <v-avatar size="64" class="mr-4">
-                                          <v-img
-                                            src="/images/img-poster.gif"
-                                            alt="User avatar"
-                                          ></v-img>
-                                        </v-avatar>
-                                        <div>
-                                          <div class="text-medium-emphasis mb-2">
-                                            <h1 class="mb-0">
-                                              Name: {{ task.requested_by_fullname || 'N/A' }}
-                                            </h1>
-                                          </div>
-                                        </div>
+                                      <div class="text-medium-emphasis mb-4">
+                                        <h1>Requested by: <br> {{ req.fullname }}</h1>
                                       </div>
-                                      <br />
+                                      <div class="mb-2">Task ID: #{{ req.task_id }}</div>
+
                                       <v-row class="tight-row">
-                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0"
-                                          >Contact Number:</v-col
-                                        >
-                                        <v-col cols="6" class="py-1 px-0">{{
-                                          task.requested_by_phone || 'N/A'
-                                        }}</v-col>
-                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0"
-                                          >Ratings</v-col
-                                        >
-                                        <v-col cols="6" class="py-1 px-0">{{
-                                          task.requested_by_ratings || 'N/A'
-                                        }}</v-col>
+                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0">
+                                          Phone:
+                                        </v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{ req.phone }}</v-col>
+                                        <v-col cols="6" class="text-medium-emphasis py-1 px-0">
+                                          Ratings:
+                                        </v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{ req.ratings }}</v-col>
                                       </v-row>
-                                      <br />
                                     </v-card-text>
-                                    <v-divider class="mt-2"></v-divider>
-                                    <v-card-actions class="my-2 d-flex justify-end">
-                                      <v-btn
-                                        class="text-none"
-                                        rounded="xl"
-                                        text="Cancel"
-                                        @click="isActive.value = false"
-                                      ></v-btn>
-                                      <v-btn
-                                        class="text-none"
-                                        color="green"
-                                        rounded="xl"
-                                        text="Accept"
-                                        variant="flat"
-                                        @click="isActive.value = false"
-                                      ></v-btn>
-                                    </v-card-actions>
                                   </v-card>
                                 </template>
                               </v-dialog>
@@ -299,10 +280,7 @@ const requestTask = async (task, isActive) => {
                         <br />
                       </template>
                     </v-list>
-                    <div
-                      v-if="!loading && !tasks.filter((t) => t.requested_by).length"
-                      class="text-center"
-                    >
+                    <div v-if="!loading && !requests.length" class="text-center">
                       No requests to display.
                     </div>
                   </v-window-item>
