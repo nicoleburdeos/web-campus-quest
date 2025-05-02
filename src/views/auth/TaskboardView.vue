@@ -12,6 +12,9 @@ const requests = ref([])
 const loading = ref(false)
 const error = ref('')
 
+// Add after other refs
+const userHasCreatedTasks = ref(false)
+
 // Fetch tasks from Supabase
 const fetchTasks = async () => {
   loading.value = true
@@ -28,14 +31,57 @@ const fetchTasks = async () => {
   loading.value = false
 }
 
-// Fetch requests from Supabase
+// Add new function to check user tasks
+const checkUserTasks = async () => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    userHasCreatedTasks.value = false
+    return
+  }
+
+  const { data } = await supabase.from('tasks').select('id').eq('user_id', user.id).limit(1)
+
+  userHasCreatedTasks.value = !!(data && data.length)
+}
+
+// Replace the existing fetchRequests function
 const fetchRequests = async () => {
   loading.value = true
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    requests.value = []
+    loading.value = false
+    return
+  }
+
+  // Get all tasks created by the current user
+  const { data: userTasks } = await supabase.from('tasks').select('id').eq('user_id', user.id)
+
+  if (!userTasks || !userTasks.length) {
+    requests.value = []
+    loading.value = false
+    return
+  }
+
+  // Get task IDs created by the user
+  const userTaskIds = userTasks.map((task) => task.id)
+
+  // Get requests for those tasks
   const { data, error: fetchError } = await supabase
     .from('task_requests')
     .select('*')
+    .in('task_id', userTaskIds)
     .order('created_at', { ascending: false })
-  if (!fetchError) requests.value = data
+
+  if (!fetchError) {
+    requests.value = data
+  } else {
+    requests.value = []
+  }
   loading.value = false
 }
 
@@ -44,7 +90,21 @@ onMounted(() => {
   fetchRequests()
 })
 
-const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
+const hasUserRequestedTask = async (taskId) => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return true // Prevent request if no user
+
+  const { data, error } = await supabase
+    .from('task_requests')
+    .select('id')
+    .eq('task_id', taskId)
+    .eq('user_id', user.id)
+    .single()
+
+  return !!data // Returns true if request exists, false otherwise
+}
 
 const requestTask = async (task, isActive) => {
   const {
@@ -52,13 +112,20 @@ const requestTask = async (task, isActive) => {
   } = await supabase.auth.getUser()
   if (!user) return
 
+  // Check if user has already requested this task
+  const alreadyRequested = await hasUserRequestedTask(task.id)
+  if (alreadyRequested) {
+    error.value = 'You have already requested this task'
+    return
+  }
+
   const fullname =
     `${user.user_metadata.firstname || ''} ${user.user_metadata.lastname || ''}`.trim()
   const phone = user.user_metadata.phone || ''
   const ratings = user.user_metadata.ratings || 'N/A'
 
   // Insert a new request for this task
-  const { error } = await supabase.from('task_requests').insert([
+  const { error: requestError } = await supabase.from('task_requests').insert([
     {
       task_id: task.id,
       user_id: user.id,
@@ -68,9 +135,11 @@ const requestTask = async (task, isActive) => {
     },
   ])
 
-  if (!error) {
+  if (!requestError) {
     isActive.value = false
     await fetchRequests()
+  } else {
+    error.value = requestError.message
   }
 }
 </script>
@@ -255,7 +324,10 @@ const requestTask = async (task, isActive) => {
                                     <v-divider class="mb-4"></v-divider>
                                     <v-card-text>
                                       <div class="text-medium-emphasis mb-4">
-                                        <h1>Requested by: <br> {{ req.fullname }}</h1>
+                                        <h1>
+                                          Requested by: <br />
+                                          {{ req.fullname }}
+                                        </h1>
                                       </div>
                                       <div class="mb-2">Task ID: #{{ req.task_id }}</div>
 
