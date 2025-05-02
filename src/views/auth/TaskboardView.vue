@@ -30,6 +30,35 @@ const fetchTasks = async () => {
 onMounted(fetchTasks)
 
 const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
+
+const requestTask = async (task, isActive) => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return
+
+  // Get info from user_metadata
+  const fullname =
+    `${user.user_metadata.firstname || ''} ${user.user_metadata.lastname || ''}`.trim()
+  const phone = user.user_metadata.phone || ''
+  const ratings = user.user_metadata.ratings || 'N/A' // Adjust if you have ratings
+
+  // Update the task with requester info
+  const { error } = await supabase
+    .from('tasks')
+    .update({
+      requested_by: user.id || null,
+      requested_by_fullname: fullname || '',
+      requested_by_phone: phone || '',
+      requested_by_ratings: ratings || '',
+    })
+    .eq('id', task.id)
+
+  if (!error) {
+    isActive.value = false
+    await fetchTasks()
+  }
+}
 </script>
 
 <template>
@@ -73,7 +102,9 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                     <v-card-title class="d-flex justify-space-between align-center">
                                       <div class="d-flex align-center">
                                         <v-icon class="me-2">mdi-information</v-icon>
-                                        <div class="text-h5 text-medium-emphasis ps-2">Task Info</div>
+                                        <div class="text-h5 text-medium-emphasis ps-2">
+                                          Task Info
+                                        </div>
                                       </div>
                                       <v-btn
                                         icon="mdi-close"
@@ -105,7 +136,9 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0">
                                           Task Type:
                                         </v-col>
-                                        <v-col cols="6" class="py-1 px-0">{{ task.task_type }}</v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{
+                                          task.task_type
+                                        }}</v-col>
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0">
                                           Payment Method:
                                         </v-col>
@@ -115,7 +148,9 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0">
                                           Quantity:
                                         </v-col>
-                                        <v-col cols="6" class="py-1 px-0">{{ task.quantity }}</v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{
+                                          task.quantity
+                                        }}</v-col>
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0">
                                           Service Fee:
                                         </v-col>
@@ -154,8 +189,10 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                         rounded="xl"
                                         text="Request"
                                         variant="flat"
-                                        @click="isActive.value = false"
-                                      ></v-btn>
+                                        @click="requestTask(task, isActive)"
+                                      >
+                                        Request
+                                      </v-btn>
                                     </v-card-actions>
                                   </v-card>
                                 </template>
@@ -164,7 +201,7 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                           </template>
                         </v-list-item>
                         <v-divider></v-divider>
-                        <br>
+                        <br />
                       </template>
                     </v-list>
                     <div v-if="!loading && !tasks.length" class="text-center">
@@ -173,13 +210,16 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                   </v-window-item>
                   <!-- Task Requests Tab -->
                   <v-window-item :value="1">
-                    <v-virtual-scroll :items="requestItems" height="320" item-height="20">
-                      <template v-slot:default="{ item }">
-                        <v-list-item :subtitle="`Request #${item}`" :title="'Request Name'">
-                          <template v-slot:prepend>
+                    <v-list v-if="!loading && tasks.length" class="transparent-list">
+                      <template v-for="task in tasks.filter((t) => t.requested_by)" :key="task.id">
+                        <v-list-item
+                          :title="task.task_name"
+                          :subtitle="`${new Date(task.created_at).toLocaleTimeString()}`"
+                        >
+                          <template #prepend>
                             <v-icon color="primary">mdi-account-question</v-icon>
                           </template>
-                          <template v-slot:append>
+                          <template #append>
                             <v-btn icon variant="plain" size="small" class="info-btn">
                               <v-icon>mdi-information</v-icon>
                               <v-dialog activator="parent" max-width="500">
@@ -209,7 +249,9 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                         </v-avatar>
                                         <div>
                                           <div class="text-medium-emphasis mb-2">
-                                            <h1 class="mb-0">Name: Cj Dumags</h1>
+                                            <h1 class="mb-0">
+                                              Name: {{ task.requested_by_fullname || 'N/A' }}
+                                            </h1>
                                           </div>
                                         </div>
                                       </div>
@@ -218,14 +260,16 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0"
                                           >Contact Number:</v-col
                                         >
-                                        <v-col cols="6" class="py-1 px-0">09189232435</v-col>
-
+                                        <v-col cols="6" class="py-1 px-0">{{
+                                          task.requested_by_phone || 'N/A'
+                                        }}</v-col>
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0"
                                           >Ratings</v-col
                                         >
-                                        <v-col cols="6" class="py-1 px-0">10/10</v-col>
+                                        <v-col cols="6" class="py-1 px-0">{{
+                                          task.requested_by_ratings || 'N/A'
+                                        }}</v-col>
                                       </v-row>
-
                                       <br />
                                     </v-card-text>
                                     <v-divider class="mt-2"></v-divider>
@@ -254,7 +298,13 @@ const requestItems = Array.from({ length: 4 }, (k, v) => v + 1)
                         <v-divider></v-divider>
                         <br />
                       </template>
-                    </v-virtual-scroll>
+                    </v-list>
+                    <div
+                      v-if="!loading && !tasks.filter((t) => t.requested_by).length"
+                      class="text-center"
+                    >
+                      No requests to display.
+                    </div>
                   </v-window-item>
                 </v-window>
               </v-card-text>
