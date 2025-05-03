@@ -142,6 +142,37 @@ const requestTask = async (task, isActive) => {
     error.value = requestError.message
   }
 }
+
+const acceptRequest = async (req, isActive) => {
+  // Example: update the request status to 'accepted'
+  const { error: updateError } = await supabase
+    .from('task_requests')
+    .update({ status: 'accepted' })
+    .eq('id', req.id)
+
+  if (!updateError) {
+    isActive.value = false
+    await fetchRequests()
+  } else {
+    error.value = updateError.message
+  }
+}
+
+const createTask = async (taskData) => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const creator_name =
+    `${user.user_metadata.firstname || ''} ${user.user_metadata.lastname || ''}`.trim()
+
+  await supabase.from('tasks').insert([
+    {
+      ...taskData,
+      user_id: user.id,
+      creator_name, 
+    },
+  ])
+}
 </script>
 
 <template>
@@ -201,7 +232,12 @@ const requestTask = async (task, isActive) => {
                                         <h1>Task Name: {{ task.task_name }}</h1>
                                       </div>
                                       <div class="mb-2">Task ID: #{{ task.id }}</div>
-
+                                      <div class="mb-2">
+                                        Created by:
+                                        <span class="font-weight-bold">
+                                          {{ task.creator_name }}
+                                        </span>
+                                      </div>
                                       <br />
                                       <v-row class="tight-row">
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0">
@@ -342,6 +378,24 @@ const requestTask = async (task, isActive) => {
                                         <v-col cols="6" class="py-1 px-0">{{ req.ratings }}</v-col>
                                       </v-row>
                                     </v-card-text>
+                                    <v-card-actions class="my-2 d-flex justify-end">
+                                      <v-btn
+                                        class="text-none"
+                                        rounded="xl"
+                                        text="Close"
+                                        @click="isActive.value = false"
+                                      ></v-btn>
+                                      <v-btn
+                                        class="text-none"
+                                        color="green"
+                                        rounded="xl"
+                                        text="Accept"
+                                        variant="flat"
+                                        @click="acceptRequest(req, isActive)"
+                                      >
+                                        Accept
+                                      </v-btn>
+                                    </v-card-actions>
                                   </v-card>
                                 </template>
                               </v-dialog>

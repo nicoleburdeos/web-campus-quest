@@ -83,9 +83,14 @@ const handleSubmit = async () => {
     } = await supabase.auth.getUser()
     if (userError) throw userError
 
+    // Get full name from user_metadata
+    const creator_name =
+      `${user.user_metadata.firstname || ''} ${user.user_metadata.lastname || ''}`.trim()
+
     // Format the data
     const taskData = {
       user_id: user.id,
+      creator_name, 
       task_name: formData.value.task_name,
       pickup_point: formData.value.pickup_point,
       destination: formData.value.destination,
