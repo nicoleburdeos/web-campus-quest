@@ -100,7 +100,7 @@ async function submitReview() {
   <DashboardView>
     <v-container fluid style="max-width: 700px">
       <!-- Task Summary Card -->
-      <v-card class="mb-6 pa-6" elevation="2">
+      <v-card class="mb-6 pa-6 glass-card" elevation="2">
         <div class="d-flex flex-column flex-md-row justify-space-between align-center mb-4">
           <div>
             <div class="text-h5 font-weight-bold mb-1">{{ task?.title }}</div>
@@ -118,7 +118,7 @@ async function submitReview() {
           </div>
         </div>
         <v-divider class="mb-4"></v-divider>
-   
+
         <div class="mb-2">
           <v-icon color="deep-purple" class="mr-2">mdi-account</v-icon>
           <span class="font-weight-medium">Created by:</span>
@@ -132,19 +132,17 @@ async function submitReview() {
         <div class="mb-2">
           <v-icon color="deep-orange" class="mr-2">mdi-map-marker</v-icon>
           <span class="font-weight-medium">Pickup Location:</span>
-          <span>{{task?.pickup_location }}</span>
+          <span>{{ task?.pickup_location }}</span>
         </div>
         <div class="mb-2">
           <v-icon color="deep-orange" class="mr-2">mdi-map-marker</v-icon>
           <span class="font-weight-medium">Destination:</span>
           <span>{{ task?.pickup_location }}</span>
         </div>
-
- 
       </v-card>
 
       <!-- Status Timeline -->
-      <v-card class="mb-6 pa-6" elevation="1">
+      <v-card class="mb-6 pa-6 glass-card" elevation="1">
         <div class="d-flex justify-space-between align-center mb-4">
           <v-btn
             :disabled="currentStatus === 0"
@@ -162,7 +160,7 @@ async function submitReview() {
             >Next</v-btn
           >
         </div>
-        <v-timeline density="compact" side="end">
+        <v-timeline density="compact" side="end" line-color="light-green-darken-2">
           <v-timeline-item
             v-for="(status, idx) in statuses"
             :key="status.text"
@@ -213,5 +211,19 @@ async function submitReview() {
   border-radius: 18px;
   background: #fff;
   box-shadow: 0 2px 12px rgba(60, 60, 60, 0.07);
+}
+.glass-card {
+  background: rgba(15, 15, 15, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 0 32px rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.9);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 </style>

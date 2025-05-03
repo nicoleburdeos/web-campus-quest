@@ -44,21 +44,6 @@ const fetchTasks = async () => {
   loading.value = false
 }
 
-// Add new function to check user tasks
-const checkUserTasks = async () => {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) {
-    userHasCreatedTasks.value = false
-    return
-  }
-
-  const { data } = await supabase.from('tasks').select('id').eq('user_id', user.id).limit(1)
-
-  userHasCreatedTasks.value = !!(data && data.length)
-}
-
 // Replace the existing fetchRequests function
 const fetchRequests = async () => {
   loading.value = true
@@ -148,7 +133,7 @@ const hasUserRequestedTask = async (taskId) => {
   } = await supabase.auth.getUser()
   if (!user) return true // Prevent request if no user
 
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('task_requests')
     .select('id')
     .eq('task_id', taskId)
@@ -228,22 +213,6 @@ const acceptRequest = async (req, isActive) => {
   } else {
     error.value = updateError?.message || taskError?.message || deleteError?.message
   }
-}
-
-const createTask = async (taskData) => {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  const creator_name =
-    `${user.user_metadata.firstname || ''} ${user.user_metadata.lastname || ''}`.trim()
-
-  await supabase.from('tasks').insert([
-    {
-      ...taskData,
-      user_id: user.id,
-      creator_name,
-    },
-  ])
 }
 </script>
 
