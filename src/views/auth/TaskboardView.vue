@@ -1,6 +1,6 @@
 <script setup>
 import DashboardView from '../../components/layout/DashboardView.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 import { supabase } from '@/utils/supabase'
 
@@ -14,6 +14,7 @@ const error = ref('')
 
 // Add after other refs
 const userHasCreatedTasks = ref(false)
+const readRequestIds = ref(new Set(JSON.parse(localStorage.getItem('readRequests') || '[]')))
 
 // Snackbar state
 const snackbar = ref(false)
@@ -83,6 +84,10 @@ const fetchRequests = async () => {
 
   if (!fetchError) {
     requests.value = data
+    // Clean up stored read IDs that no longer exist
+    const currentIds = new Set(data.map((req) => req.id))
+    readRequestIds.value = new Set([...readRequestIds.value].filter((id) => currentIds.has(id)))
+    localStorage.setItem('readRequests', JSON.stringify([...readRequestIds.value]))
   } else {
     requests.value = []
   }
@@ -92,6 +97,31 @@ const fetchRequests = async () => {
 onMounted(() => {
   fetchTasks()
   fetchRequests()
+})
+
+// Add computed properties for notification count
+const unreadRequests = computed(() => {
+  return requests.value.filter((req) => !readRequestIds.value.has(req.id))
+})
+
+const requestCount = computed(() => unreadRequests.value.length)
+const formattedRequestCount = computed(() => {
+  return requestCount.value > 9 ? '9+' : requestCount.value.toString()
+})
+
+// Add function to mark requests as read
+const markRequestsAsRead = () => {
+  const newReadIds = requests.value.map((req) => req.id)
+  readRequestIds.value = new Set([...readRequestIds.value, ...newReadIds])
+  localStorage.setItem('readRequests', JSON.stringify([...readRequestIds.value]))
+}
+
+// Add watch for tab changes
+watch(currentTab, (newValue) => {
+  if (newValue === 1) {
+    // When Task Requests tab is selected
+    markRequestsAsRead()
+  }
 })
 
 const hasUserRequestedTask = async (taskId) => {
@@ -107,7 +137,7 @@ const hasUserRequestedTask = async (taskId) => {
     .eq('user_id', user.id)
     .single()
 
-  return !!data 
+  return !!data
 }
 
 const requestTask = async (task, isActive) => {
@@ -208,8 +238,21 @@ const createTask = async (taskData) => {
             <v-card class="mx-auto glass-card" elevation="0">
               <v-img src="/images/cq-logo.png" :height="mobile ? '100' : '70'"></v-img>
               <v-tabs v-model="currentTab" color="green-darken-4" align-tabs="center" grow>
-                <v-tab :value="0">Task Quest</v-tab>
-                <v-tab :value="1">Task Requests</v-tab>
+                <v-tab :value="0">Task Quest<v-icon class="tab-icon">mdi-store</v-icon></v-tab>
+                <v-tab :value="1">
+                  Task Requests
+                  <v-badge
+                    :content="formattedRequestCount"
+                    :model-value="unreadRequests.length > 0"
+                    color="red-accent-4"
+                    location="top end"
+                    size="large"
+                    scale="1.5"
+                    class="tab-icon"
+                  >
+                    <v-icon>mdi-bell</v-icon>
+                  </v-badge>
+                </v-tab>
               </v-tabs>
               <v-card-text>
                 <v-window v-model="currentTab">
@@ -498,5 +541,10 @@ const createTask = async (taskData) => {
 .transparent-list {
   background: transparent !important;
   box-shadow: none !important;
+}
+.tab-icon {
+  position: absolute;
+  top: 9px;
+  right: 16px;
 }
 </style>
