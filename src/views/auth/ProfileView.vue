@@ -1,90 +1,166 @@
 <script setup>
 import DashboardView from '../../components/layout/DashboardView.vue'
-import { ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
+import { supabase } from '@/utils/supabase'
+
+const userData = ref({
+  email: '',
+  fullname: '',
+  phone: '',
+})
+
+// Fetch user data
+const getUser = async () => {
+  const {
+    data: {
+      user: { user_metadata: metadata },
+    },
+  } = await supabase.auth.getUser()
+
+  userData.value.email = metadata.email
+  userData.value.fullname = `${metadata.firstname} ${metadata.lastname}`
+  userData.value.phone = metadata.phone
+}
+
+// Generate initials
+const userInitials = computed(() => {
+  const names = userData.value.fullname.trim().split(' ')
+  return names
+    .map((n) => n[0]?.toUpperCase())
+    .join('')
+    .slice(0, 2)
+})
+
+onMounted(() => {
+  getUser()
+})
 </script>
 
 <template>
   <DashboardView>
-    <v-container fluid>
-      <v-row>
-        <v-col cols="12"> </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <v-card class="profile-card pa-6" elevation="1">
+    <v-container fluid class="fill-height d-flex justify-center align-center">
+      <v-card class="glass-card pa-10" elevation="10" max-width="1100" width="100%">
+        <v-row>
+          <!-- Left section: Avatar and Summary -->
+          <v-col
+            cols="12"
+            md="4"
+            class="text-center d-flex flex-column align-center justify-center"
+          >
+            <v-avatar size="150" color="green" class="mb-4">
+              <span class="text-h3 text-white">{{ userInitials }}</span>
+            </v-avatar>
+            <div class="text-h5 font-weight-bold text-white mb-2">{{ userData.fullname }}</div>
+            <v-rating value="5" color="amber" dense readonly size="22" class="mb-1" />
+            <div class="text-caption text-white-70">214 ratings</div>
+            <v-progress-linear value="85" height="8" color="primary" rounded class="my-2" />
+            <div class="text-caption font-italic text-white-70">85% trust score</div>
+          </v-col>
+
+          <!-- Right section: User details -->
+          <v-col cols="12" md="8">
+            <div class="text-h5 text-white font-weight-medium mb-4 text-center mb-10">
+              User Profile Information
+            </div>
             <v-row>
-              <!-- Left side and Basic Info -->
-              <v-col cols="12" md="3" class="d-flex flex-column align-center justify-center">
-                <v-avatar size="100" class="mb-3">
-                  <v-img src="/images/cq-logo.png" alt="User avatar"></v-img>
-                </v-avatar>
-                <div class="text-h6 font-weight-bold mb-1">Jannie Regel</div>
-                <div class="mb-1">
-                  <v-rating value="5" color="amber" dense readonly size="18"></v-rating>
-                  <span class="ml-1 grey--text text--darken-1">214 rates</span>
-                </div>
-                <v-progress-linear
-                  value="85"
-                  height="8"
-                  color="primary"
-                  rounded
-                  class="mb-1"
-                ></v-progress-linear>
-                <div class="caption grey--text">85% trust</div>
+              <v-col cols="12" sm="6" class="mb-4">
+                <div class="label">Email</div>
+                <div class="value">{{ userData.email }}</div>
               </v-col>
-              <v-divider vertical></v-divider>
-              <!-- Right side Details -->
-              <v-col cols="12" md="9">
-                <v-row>
-                  <!-- User profile -->
-                  <v-col cols="12" md="12" class="pb-0">
-                    <div class="font-weight-bold mb-2"><h2>User profile</h2></div>
-
-                    <br /><br />
-
-                    <v-row>
-                      <v-col cols="4"
-                        ><span class="text-medium-emphasis py-1 px-0">Email:</span>
-                        <span class="font-weight-bold mb-2"> evangelistajosh@gmailcom</span></v-col
-                      >
-
-                      <v-col cols="4"
-                        ><span class="text-medium-emphasis py-1 px-0">Gender:</span>
-                        <span class="font-weight-bold mb-2"> Female</span></v-col
-                      >
-
-                      <v-col cols="4"
-                        ><span class="text-medium-emphasis py-1 px-0">Mobile Number:</span>
-                        <span class="font-weight-bold mb-2"> 091134325</span></v-col
-                      >
-                    </v-row>
-                  </v-col>
-                </v-row>
+              <v-col cols="12" sm="6" class="mb-4">
+                <div class="label">Mobile Number</div>
+                <div class="value">{{ userData.phone }}</div>
               </v-col>
+              <!-- Optional: Add more fields if needed -->
             </v-row>
-          </v-card>
-        </v-col>
-      </v-row>
+          </v-col>
+        </v-row>
+      </v-card>
     </v-container>
   </DashboardView>
 </template>
 
 <style scoped>
-.profile-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  margin-top: 1rem;
-  letter-spacing: -1px;
+.fill-height {
+  min-height: 100vh;
 }
-.profile-card {
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 2px 12px rgba(60, 60, 60, 0.07);
+
+.glass-card {
+  background: rgba(15, 15, 15, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 0 32px rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.9);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
-.profile-link {
-  color: #1976d2;
-  cursor: pointer;
-  text-decoration: underline;
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    transparent 60%
+  );
+  transition: all 0.7s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.7),
+    inset 0 0 32px rgba(255, 255, 255, 0.05);
+}
+
+.glass-card:hover::before {
+  left: 100%;
+}
+
+.value {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px 20px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.value:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(5px);
+}
+
+.label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 8px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.text-white-70 {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 600px) {
+  .glass-card {
+    background: rgba(15, 15, 15, 0.85);
+    padding: 1.5rem !important;
+  }
 }
 </style>
