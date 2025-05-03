@@ -15,6 +15,10 @@ const error = ref('')
 // Add after other refs
 const userHasCreatedTasks = ref(false)
 
+// Snackbar state
+const snackbar = ref(false)
+const snackbarMessage = ref('')
+
 // Fetch tasks from Supabase
 const fetchTasks = async () => {
   loading.value = true
@@ -103,7 +107,7 @@ const hasUserRequestedTask = async (taskId) => {
     .eq('user_id', user.id)
     .single()
 
-  return !!data // Returns true if request exists, false otherwise
+  return !!data 
 }
 
 const requestTask = async (task, isActive) => {
@@ -111,6 +115,12 @@ const requestTask = async (task, isActive) => {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return
+
+  if (task.status === 'accepted') {
+    snackbar.value = true
+    snackbarMessage.value = 'This task has already been accepted '
+    return
+  }
 
   // Check if user has already requested this task
   const alreadyRequested = await hasUserRequestedTask(task.id)
@@ -144,17 +154,31 @@ const requestTask = async (task, isActive) => {
 }
 
 const acceptRequest = async (req, isActive) => {
-  // Example: update the request status to 'accepted'
+  // 1. Accept the selected request
   const { error: updateError } = await supabase
     .from('task_requests')
     .update({ status: 'accepted' })
     .eq('id', req.id)
 
-  if (!updateError) {
+  // 2. Delete all other requests for this task
+  const { error: deleteError } = await supabase
+    .from('task_requests')
+    .delete()
+    .eq('task_id', req.task_id)
+    .neq('id', req.id)
+
+  // 3. Update the related task status
+  const { error: taskError } = await supabase
+    .from('tasks')
+    .update({ status: 'accepted' })
+    .eq('id', req.task_id)
+
+  if (!updateError && !taskError && !deleteError) {
     isActive.value = false
     await fetchRequests()
+    await fetchTasks()
   } else {
-    error.value = updateError.message
+    error.value = updateError?.message || taskError?.message || deleteError?.message
   }
 }
 
@@ -169,7 +193,7 @@ const createTask = async (taskData) => {
     {
       ...taskData,
       user_id: user.id,
-      creator_name, 
+      creator_name,
     },
   ])
 }
@@ -180,7 +204,7 @@ const createTask = async (taskData) => {
     <v-container fluid>
       <v-main>
         <div class="main-content">
-          <v-col cols="12" md="6" lg="6">
+          <v-col cols="12" md="8" lg="8">
             <v-card class="mx-auto glass-card" elevation="0">
               <v-img src="/images/cq-logo.png" :height="mobile ? '100' : '70'"></v-img>
               <v-tabs v-model="currentTab" color="green-darken-4" align-tabs="center" grow>
@@ -208,6 +232,16 @@ const createTask = async (taskData) => {
                             <v-icon>mdi-account</v-icon>
                           </template>
                           <template #append>
+                            <!-- Status Chip -->
+                            <v-chip
+                              :color="task.status === 'accepted' ? 'green' : 'orange'"
+                              class="me-2"
+                              label
+                              small
+                              text-color="white"
+                            >
+                              {{ task.status === 'accepted' ? 'Accepted' : 'Pending' }}
+                            </v-chip>
                             <v-btn icon variant="plain" size="small" class="info-btn">
                               <v-icon>mdi-information</v-icon>
                               <v-dialog activator="parent" max-width="500">
@@ -283,6 +317,15 @@ const createTask = async (taskData) => {
                                         <v-col cols="6" class="py-1 px-0"> {{ task.status }}</v-col>
                                       </v-row>
                                       <br />
+                                      <v-alert
+                                        v-if="task.status === 'accepted'"
+                                        type="success"
+                                        class="mb-2"
+                                        border="start"
+                                        color="green"
+                                      >
+                                        This task has already been accepted.
+                                      </v-alert>
                                       <div class="mb-2">Message (optional)</div>
                                       <v-textarea
                                         :counter="300"
@@ -308,6 +351,7 @@ const createTask = async (taskData) => {
                                         rounded="xl"
                                         text="Request"
                                         variant="flat"
+                                        :disabled="task.status === 'accepted'"
                                         @click="requestTask(task, isActive)"
                                       >
                                         Request
