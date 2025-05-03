@@ -14,11 +14,19 @@ const error = ref('')
 
 // Add after other refs
 const userHasCreatedTasks = ref(false)
-const readRequestIds = ref(new Set(JSON.parse(localStorage.getItem('readRequests') || '[]')))
+const readRequestIds = ref(new Set())
 
 // Snackbar state
 const snackbar = ref(false)
 const snackbarMessage = ref('')
+
+// Add function to get storage key for current user
+const getStorageKey = async () => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  return user ? `readRequests_${user.id}` : null
+}
 
 // Fetch tasks from Supabase
 const fetchTasks = async () => {
@@ -87,14 +95,21 @@ const fetchRequests = async () => {
     // Clean up stored read IDs that no longer exist
     const currentIds = new Set(data.map((req) => req.id))
     readRequestIds.value = new Set([...readRequestIds.value].filter((id) => currentIds.has(id)))
-    localStorage.setItem('readRequests', JSON.stringify([...readRequestIds.value]))
+    const storageKey = await getStorageKey()
+    if (storageKey) {
+      localStorage.setItem(storageKey, JSON.stringify([...readRequestIds.value]))
+    }
   } else {
     requests.value = []
   }
   loading.value = false
 }
 
-onMounted(() => {
+onMounted(async () => {
+  const storageKey = await getStorageKey()
+  if (storageKey) {
+    readRequestIds.value = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]'))
+  }
   fetchTasks()
   fetchRequests()
 })
@@ -109,11 +124,14 @@ const formattedRequestCount = computed(() => {
   return requestCount.value > 9 ? '9+' : requestCount.value.toString()
 })
 
-// Add function to mark requests as read
-const markRequestsAsRead = () => {
-  const newReadIds = requests.value.map((req) => req.id)
-  readRequestIds.value = new Set([...readRequestIds.value, ...newReadIds])
-  localStorage.setItem('readRequests', JSON.stringify([...readRequestIds.value]))
+// Modify function to mark requests as read
+const markRequestsAsRead = async () => {
+  const storageKey = await getStorageKey()
+  if (storageKey) {
+    const newReadIds = requests.value.map((req) => req.id)
+    readRequestIds.value = new Set([...readRequestIds.value, ...newReadIds])
+    localStorage.setItem(storageKey, JSON.stringify([...readRequestIds.value]))
+  }
 }
 
 // Add watch for tab changes
