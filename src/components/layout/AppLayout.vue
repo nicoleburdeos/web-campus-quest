@@ -10,7 +10,6 @@ const theme = ref('light')
 <template>
   <v-responsive class="border rounded">
     <v-app :theme="theme">
-      
       <!-- Background image added here -->
       <v-main
         style="
@@ -23,10 +22,6 @@ const theme = ref('light')
       >
         <slot name="content"></slot>
       </v-main>
-
-      <v-footer class="font-weight-bold" color="transparent" elevation="0" border app >
-        Copyright © 2025 Campus Quest | All rights reserved.</v-footer
-      >
     </v-app>
   </v-responsive>
 </template>

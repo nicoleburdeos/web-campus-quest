@@ -23,7 +23,7 @@ const onSubmit = async () => {
   if (error) {
     alert('Login failed: ' + error.message)
   } else {
-    router.replace('/dashboard') 
+    router.replace('/task-board')
   }
 }
 

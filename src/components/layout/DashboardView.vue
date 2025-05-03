@@ -5,7 +5,6 @@ import { supabase } from '@/utils/supabase'
 import { useRouter } from 'vue-router'
 import SideNavbarView from './SideNavbarView.vue'
 
-const drawer = ref(true)
 const router = useRouter()
 
 const userData = ref({
@@ -47,16 +46,6 @@ onMounted(() => {
         <v-row>
           <!-- Navigation Drawer -->
           <v-col cols="12" md="4">
-            <!-- Mobile Nav Toggle Button -->
-            <v-btn
-              class="d-md-none mb-2"
-              icon
-              @click="drawer = !drawer"
-              color="green-darken-4"
-              style="position: absolute; top: 16px; left: 16px; z-index: 10"
-            >
-              <v-icon>{{ drawer ? 'mdi-close' : 'mdi-menu' }}</v-icon>
-            </v-btn>
             <br />
             <SideNavbarView :onLogout="onLogout" :userData="userData"></SideNavbarView>
           </v-col>
