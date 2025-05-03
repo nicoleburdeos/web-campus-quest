@@ -72,9 +72,15 @@ onMounted(() => {
                   to="/task-board"
                 ></v-list-item>
                 <v-list-item
+                  prepend-icon="mdi-clipboard-text"
+                  title="On Going Task"
+                  value="ongoing-tas"
+                  to="/ongoing-task"
+                ></v-list-item>
+                <v-list-item
                   prepend-icon="mdi-history"
                   title="Recent Task"
-                  value="recentTask"
+                  value="recent-task"
                   to="/recent-task"
                 ></v-list-item>
 

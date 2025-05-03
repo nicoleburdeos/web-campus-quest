@@ -202,20 +202,20 @@ const requestTask = async (task, isActive) => {
 }
 
 const acceptRequest = async (req, isActive) => {
-  // 1. Accept the selected request
+  // Accept the selected request
   const { error: updateError } = await supabase
     .from('task_requests')
     .update({ status: 'accepted' })
     .eq('id', req.id)
 
-  // 2. Delete all other requests for this task
+  //  Delete all other requests for this task
   const { error: deleteError } = await supabase
     .from('task_requests')
     .delete()
     .eq('task_id', req.task_id)
     .neq('id', req.id)
 
-  // 3. Update the related task status
+  //  Update the related task status
   const { error: taskError } = await supabase
     .from('tasks')
     .update({ status: 'accepted' })

@@ -8,6 +8,7 @@ import RecentTaskView from '@/views/auth/RecentTaskView.vue'
 import ProfileView from '@/views/auth/ProfileView.vue'
 import NotFoundView from '@/views/error/NotFoundView.vue'
 import SideNavbarView from '@/components/layout/SideNavbarView.vue'
+import OngoingTaskView from '@/views/auth/OngoingTaskView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +45,12 @@ const router = createRouter({
       path: '/recent-task',
       name: 'recent-task',
       component: RecentTaskView,
+    },
+
+    {
+      path: '/ongoing-task',
+      name: 'ongoing-task',
+      component: OngoingTaskView,
     },
 
     {
