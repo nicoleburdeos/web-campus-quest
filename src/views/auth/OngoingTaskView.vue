@@ -23,6 +23,7 @@ const statusDescriptions = [
   'Task creator has confirmed delivery.',
 ]
 const currentStatus = ref(0)
+const rating = ref(0)
 
 onMounted(async () => {
   if (!bookingId) {
@@ -44,16 +45,17 @@ onMounted(async () => {
     .eq('id', bookingId)
     .single()
 
-  console.log('Fetched booking:', data)
-
   if (error) {
     console.error('Error fetching booking:', error)
     return
   }
   booking.value = data
 
-  // Set current status from task
-  currentStatus.value = data.tasks?.status ?? 0
+  // Ensure status is a number (default to 0 if not)
+  const statusNum = typeof data.tasks?.status === 'number'
+    ? data.tasks.status
+    : parseInt(data.tasks?.status) || 0
+  currentStatus.value = statusNum
 })
 
 // Update status in Supabase
@@ -72,6 +74,16 @@ async function prevStatus() {
   }
 }
 
+// Submit rating to Supabase
+async function submitRating() {
+  await supabase.from('task_bookings').update({
+    rating: rating.value // This will be 1-5
+  }).eq('id', bookingId)
+
+  currentStatus.value = 4
+  booking.value.status = 4
+  booking.value.rating = rating.value
+}
 </script>
 
 <template>
@@ -161,8 +173,24 @@ async function prevStatus() {
         </v-timeline>
       </v-card>
 
-      <!-- Debugging Booking Data -->
-      <pre>{{ booking }}</pre>
+      <v-card class="mb-6 pa-6 glass-card" elevation="2" v-if="currentStatus === 3">
+        <div class="text-center">
+          <v-rating
+            v-model="rating"
+            clearable
+          ></v-rating>
+          <div class="mt-2">Rate your delivery!</div>
+          <v-btn
+            class="mt-4"
+            color="primary"
+            @click="submitRating"
+            :disabled="rating === 0"
+          >
+            Submit
+          </v-btn>
+        </div>
+      </v-card>
+
     </v-container>
   </DashboardView>
 </template>

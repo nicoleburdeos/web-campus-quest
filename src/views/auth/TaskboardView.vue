@@ -204,6 +204,12 @@ const acceptRequest = async (req, isActive) => {
     .eq('id', req.task_id)
 
   if (!taskError && !deleteError) {
+    // Update the local tasks array immediately for instant UI feedback
+    const taskIdx = tasks.value.findIndex(t => t.id === req.task_id)
+    if (taskIdx !== -1) {
+      tasks.value[taskIdx].status = 'accepted'
+    }
+
     // Insert a new booking for this task
     const { data, error: bookingError } = await supabase
       .from('task_bookings')
