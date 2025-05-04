@@ -9,6 +9,9 @@ const userData = ref({
   phone: '',
 })
 
+const averageRating = ref(0)
+const totalRatings = ref(0)
+
 // Fetch user data
 const getUser = async () => {
   const {
@@ -22,6 +25,28 @@ const getUser = async () => {
   userData.value.phone = metadata.phone
 }
 
+// Fetch average rating
+const fetchAverageRating = async () => {
+  // Get the current user's id
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
+  // Fetch all ratings where this user is the task owner (adjust field as needed)
+  const { data, error } = await supabase
+    .from('task_bookings')
+    .select('rating')
+    .eq('user_id', user.id) 
+    .not('rating', 'is', null)
+
+  if (data && data.length) {
+    const ratings = data.map(r => r.rating).filter(r => !!r)
+    totalRatings.value = ratings.length
+    averageRating.value = ratings.length
+      ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+      : 0
+  }
+}
+
 // Generate initials
 const userInitials = computed(() => {
   const names = userData.value.fullname.trim().split(' ')
@@ -33,6 +58,7 @@ const userInitials = computed(() => {
 
 onMounted(() => {
   getUser()
+  fetchAverageRating()
 })
 </script>
 
@@ -51,10 +77,19 @@ onMounted(() => {
               <span class="text-h3 text-white">{{ userInitials }}</span>
             </v-avatar>
             <div class="text-h5 font-weight-bold text-white mb-2">{{ userData.fullname }}</div>
-            <v-rating value="5" color="amber" dense readonly size="22" class="mb-1" />
-            <div class="text-caption text-white-70">214 ratings</div>
-            <v-progress-linear value="85" height="8" color="primary" rounded class="my-2" />
-            <div class="text-caption font-italic text-white-70">85% trust score</div>
+            <v-rating
+              :model-value="averageRating"
+              color="yellow-darken-3"
+              half-increments
+              dense
+              readonly
+              size="22"
+              class="mb-1"
+            />
+            <div class="text-caption text-white-70">
+              {{ totalRatings }} rating{{ totalRatings === 1 ? '' : 's' }}
+            </div>
+
           </v-col>
 
           <!-- Right section: User details -->
