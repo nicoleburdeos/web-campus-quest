@@ -22,6 +22,9 @@ const readRequestIds = ref(new Set())
 const snackbar = ref(false)
 const snackbarMessage = ref('')
 
+// Add this in your <script setup>
+const requestorRatings = ref({})
+
 // Add function to get storage key for current user
 const getStorageKey = async () => {
   const {
@@ -205,7 +208,7 @@ const acceptRequest = async (req, isActive) => {
 
   if (!taskError && !deleteError) {
     // Update the local tasks array immediately for instant UI feedback
-    const taskIdx = tasks.value.findIndex(t => t.id === req.task_id)
+    const taskIdx = tasks.value.findIndex((t) => t.id === req.task_id)
     if (taskIdx !== -1) {
       tasks.value[taskIdx].status = 'accepted'
     }
@@ -233,6 +236,28 @@ const acceptRequest = async (req, isActive) => {
     }
   } else {
     error.value = taskError?.message || deleteError?.message
+  }
+}
+
+// Add this in your <script setup> in TaskboardView.vue
+const getUserAverageRating = async (userId) => {
+  const { data, error } = await supabase
+    .from('task_bookings')
+    .select('rating')
+    .eq('user_id', userId)
+    .not('rating', 'is', null)
+
+  if (data && data.length) {
+    const ratings = data.map((r) => Number(r.rating)).filter((r) => !!r)
+    return ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0
+  }
+  return 0
+}
+
+// Add this function
+const fetchRequestorRating = async (req) => {
+  if (!requestorRatings.value[req.user_id]) {
+    requestorRatings.value[req.user_id] = await getUserAverageRating(req.user_id)
   }
 }
 </script>
@@ -433,7 +458,11 @@ const acceptRequest = async (req, isActive) => {
                           <template #append>
                             <v-btn icon variant="plain" size="small" class="info-btn">
                               <v-icon>mdi-information</v-icon>
-                              <v-dialog activator="parent" max-width="500">
+                              <v-dialog
+                                activator="parent"
+                                max-width="500"
+                                @update:model-value="(val) => val && fetchRequestorRating(req)"
+                              >
                                 <template v-slot:default="{ isActive }">
                                   <v-card rounded="lg">
                                     <v-card-title class="d-flex justify-space-between align-center">
@@ -464,10 +493,26 @@ const acceptRequest = async (req, isActive) => {
                                           Phone:
                                         </v-col>
                                         <v-col cols="6" class="py-1 px-0">{{ req.phone }}</v-col>
+
                                         <v-col cols="6" class="text-medium-emphasis py-1 px-0">
-                                          Ratings:
+                                          Rating:
                                         </v-col>
-                                        <v-col cols="6" class="py-1 px-0">{{ req.ratings }}</v-col>
+                                        <v-col cols="6" class="py-1 px-0">
+                                          <v-rating
+                                            :model-value="requestorRatings[req.user_id] || 0"
+                                            color="yellow-darken-3"
+                                            half-increments
+                                            dense
+                                            readonly
+                                            size="22"
+                                          />
+                                          <span v-if="requestorRatings[req.user_id]"
+                                            >({{
+                                              requestorRatings[req.user_id]?.toFixed(2)
+                                            }}/5)</span
+                                          >
+                                          <span v-else>No ratings yet</span>
+                                        </v-col>
                                       </v-row>
                                     </v-card-text>
                                     <v-card-actions class="my-2 d-flex justify-end">
