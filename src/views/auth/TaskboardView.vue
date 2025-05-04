@@ -175,6 +175,7 @@ const requestTask = async (task, isActive) => {
       fullname,
       phone,
       ratings,
+      created_at: new Date().toISOString(),
     },
   ])
 
@@ -407,7 +408,8 @@ const acceptRequest = async (req, isActive) => {
                       <template v-for="req in requests" :key="req.id">
                         <v-list-item
                           :title="req.fullname"
-                          :subtitle="`${new Date(req.created_at).toLocaleTimeString()}`"
+                         :subtitle="'Task ID: ' + req.task_id"
+
                         >
                           <template #prepend>
                             <v-icon>mdi-account</v-icon>
