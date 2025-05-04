@@ -1,98 +1,94 @@
 <script setup>
 import DashboardView from '../../components/layout/DashboardView.vue'
-import { ref, computed, onMounted } from 'vue'
-import { supabase } from '@/utils/supabase' // adjust path as needed
+import { ref, onMounted } from 'vue'
+import { supabase } from '@/utils/supabase'
+import { useRouter, useRoute } from 'vue-router'
 
-const task = ref(null)
+const router = useRouter()
+const route = useRoute()
+const bookingId = route.params.id
+const booking = ref(null)
 const statuses = [
   { text: 'Heading to Pickup Point' },
   { text: 'Ordering / Acquiring' },
   { text: 'En Route to Destination' },
   { text: 'Delivered' },
-  { text: 'Completed (Rated)' },
+  { text: 'Completed' },
 ]
 const statusDescriptions = [
   'Task taker is on their way to the pickup point.',
   'Task taker is placing the order',
   'Task taker is on the way to the destination.',
   'Task has been successfully delivered or completed.',
-  'Task creator has confirmed delivery and optionally rated the taker.',
+  'Task creator has confirmed delivery.',
 ]
 const currentStatus = ref(0)
-const events = ref([])
-const input = ref(null)
-const rating = ref(0)
-const review = ref('')
-const taskId = 1 // Replace with dynamic route param or prop
 
-// Fetch task and timeline from Supabase
 onMounted(async () => {
-  // Fetch task
-  const { data: taskData } = await supabase.from('tasks').select('*').eq('id', taskId).single()
-  task.value = taskData
+  if (!bookingId) {
+    console.error('No bookingId in route params')
+    return
+  }
+  const { data, error } = await supabase
+    .from('task_bookings')
+    .select(`
+      *,
+      tasks (
+        id, task_name, task_type, service_fee, payment_method, pickup_point, destination,
+        quantity, status, message, creator_name, review
+      ),
+      task_requests (
+        id, fullname, phone, created_at
+      )
+    `)
+    .eq('id', bookingId)
+    .single()
+
+  console.log('Fetched booking:', data)
+
+  if (error) {
+    console.error('Error fetching booking:', error)
+    return
+  }
+  booking.value = data
 
   // Set current status from task
-  currentStatus.value = taskData.status
-
-  // Fetch comments/timeline
-  const { data: comments } = await supabase
-    .from('task_comments')
-    .select('*')
-    .eq('task_id', taskId)
-    .order('created_at', { ascending: false })
-  events.value =
-    comments?.map((c) => ({
-      id: c.id,
-      text: c.text,
-      time: new Date(c.created_at).toLocaleTimeString(),
-    })) || []
-
-  // Fetch review/rating if exists
-  rating.value = taskData.ratings || 0
-  review.value = taskData.review || ''
+  currentStatus.value = data.tasks?.status ?? 0
 })
 
 // Update status in Supabase
 async function nextStatus() {
   if (currentStatus.value < statuses.length - 1) {
     currentStatus.value++
-    await supabase.from('tasks').update({ status: currentStatus.value }).eq('id', task.value.id)
-    task.value.status = currentStatus.value
+    await supabase.from('tasks').update({ status: currentStatus.value }).eq('id', booking.value.tasks.id)
+    booking.value.tasks.status = currentStatus.value
   }
 }
 async function prevStatus() {
   if (currentStatus.value > 0) {
     currentStatus.value--
-    await supabase.from('tasks').update({ status: currentStatus.value }).eq('id', task.value.id)
-    task.value.status = currentStatus.value
+    await supabase.from('tasks').update({ status: currentStatus.value }).eq('id', booking.value.tasks.id)
+    booking.value.tasks.status = currentStatus.value
   }
 }
 
-// Add comment to Supabase
-async function comment() {
-  if (!input.value) return
-  const { data, error } = await supabase
-    .from('task_comments')
-    .insert([{ task_id: task.value.id, text: input.value }])
-    .select()
-    .single()
-  if (!error) {
-    events.value.unshift({
-      id: data.id,
-      text: data.text,
-      time: new Date(data.created_at).toLocaleTimeString(),
-    })
-    input.value = null
-  }
-}
+// Book task in Supabase
+async function bookTask(req) {
+  const { data, error: bookingError } = await supabase
+    .from('task_bookings')
+    .insert([
+      {
+        task_id: req.task_id,
+        user_id: req.user_id,
+        task_status: 'accepted',
+        request_id: req.id,
+      },
+    ])
+    .select('id')
 
-// Submit review to Supabase
-async function submitReview() {
-  await supabase
-    .from('tasks')
-    .update({ ratings: rating.value, review: review.value })
-    .eq('id', task.value.id)
-  alert(`Thank you for your review!\nRating: ${rating.value} stars\nReview: ${review.value}`)
+  if (!bookingError && data && data.length > 0) {
+    router.push(`/ongoingtask/${data[0].id}`)
+  }
 }
 </script>
 
@@ -103,17 +99,19 @@ async function submitReview() {
       <v-card class="mb-6 pa-6 glass-card" elevation="2">
         <div class="d-flex flex-column flex-md-row justify-space-between align-center mb-4">
           <div>
-            <div class="text-h5 font-weight-bold mb-1">{{ task?.title }}</div>
-            <v-chip color="primary" class="mr-2" label>{{ task?.type }}</v-chip>
+            <div class="text-h5 font-weight-bold mb-1">
+              {{ booking?.tasks?.task_name || 'No Task Name' }}
+            </div>
+            <v-chip color="primary" class="mr-2" label>{{ booking?.tasks?.task_type }}</v-chip>
           </div>
           <div>
             <v-chip color="success" class="mr-2" label>
               <v-icon start>mdi-currency-php</v-icon>
-              {{ task?.service_fee }}
+              {{ booking?.tasks?.service_fee }}
             </v-chip>
             <v-chip color="info" label>
               <v-icon start>mdi-credit-card</v-icon>
-              {{ task?.payment }}
+              {{ booking?.tasks?.payment_method }}
             </v-chip>
           </div>
         </div>
@@ -122,22 +120,22 @@ async function submitReview() {
         <div class="mb-2">
           <v-icon color="deep-purple" class="mr-2">mdi-account</v-icon>
           <span class="font-weight-medium">Created by:</span>
-          <span>{{ task?.created_by }}</span>
+          <span>{{ booking?.tasks?.creator_name }}</span>
         </div>
         <div class="mb-2">
           <v-icon color="deep-purple" class="mr-2">mdi-account</v-icon>
           <span class="font-weight-medium">Requested by:</span>
-          <span>{{ task?.requested_by }}</span>
+          <span>{{ booking?.task_requests?.fullname }}</span>
         </div>
         <div class="mb-2">
           <v-icon color="deep-orange" class="mr-2">mdi-map-marker</v-icon>
           <span class="font-weight-medium">Pickup Location:</span>
-          <span>{{ task?.pickup_location }}</span>
+          <span>{{ booking?.tasks?.pickup_point }}</span>
         </div>
         <div class="mb-2">
           <v-icon color="deep-orange" class="mr-2">mdi-map-marker</v-icon>
           <span class="font-weight-medium">Destination:</span>
-          <span>{{ task?.pickup_location }}</span>
+          <span>{{ booking?.tasks?.destination }}</span>
         </div>
       </v-card>
 
@@ -176,32 +174,13 @@ async function submitReview() {
                 <span v-else>{{ status.text }}</span>
               </div>
               <div class="text-grey text-body-2 mb-1">{{ statusDescriptions[idx] }}</div>
-              <!-- Stars & Review form below Delivered -->
-              <template v-if="idx === statuses.length - 2">
-                <div class="text-center mt-4">
-                  <v-rating
-                    v-model="rating"
-                    clearable
-                    color="amber"
-                    background-color="grey lighten-2"
-                  ></v-rating>
-                  <v-textarea
-                    v-model="review"
-                    label="Leave a review..."
-                    auto-grow
-                    rows="1"
-                    class="mt-2"
-                    hide-details
-                  ></v-textarea>
-                  <v-btn color="success" class="mt-2" :disabled="!rating" @click="submitReview">
-                    Submit Review
-                  </v-btn>
-                </div>
-              </template>
             </div>
           </v-timeline-item>
         </v-timeline>
       </v-card>
+
+      <!-- Debugging Booking Data -->
+      <pre>{{ booking }}</pre>
     </v-container>
   </DashboardView>
 </template>

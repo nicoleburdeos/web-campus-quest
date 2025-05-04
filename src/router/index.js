@@ -47,9 +47,10 @@ const router = createRouter({
       component: RecentTaskView,
     },
 
+
+
     {
-      path: '/ongoing-task',
-      name: 'ongoing-task',
+      path: '/ongoingtask/:id',
       component: OngoingTaskView,
     },
 

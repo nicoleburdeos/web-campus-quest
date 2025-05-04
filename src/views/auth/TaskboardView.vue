@@ -3,7 +3,9 @@ import DashboardView from '../../components/layout/DashboardView.vue'
 import { ref, onMounted, computed, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 import { supabase } from '@/utils/supabase'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const { mobile } = useDisplay()
 const currentTab = ref(0)
 
@@ -188,31 +190,43 @@ const requestTask = async (task, isActive) => {
 }
 
 const acceptRequest = async (req, isActive) => {
-  // Accept the selected request
-  const { error: updateError } = await supabase
-    .from('task_requests')
-    .update({ status: 'accepted' })
-    .eq('id', req.id)
-
-  //  Delete all other requests for this task
+  // Delete all other requests for this task
   const { error: deleteError } = await supabase
     .from('task_requests')
     .delete()
     .eq('task_id', req.task_id)
     .neq('id', req.id)
 
-  //  Update the related task status
+  // Update the related task status
   const { error: taskError } = await supabase
     .from('tasks')
     .update({ status: 'accepted' })
     .eq('id', req.task_id)
 
-  if (!updateError && !taskError && !deleteError) {
-    isActive.value = false
-    await fetchRequests()
-    await fetchTasks()
+  if (!taskError && !deleteError) {
+    // Insert a new booking for this task
+    const { data, error: bookingError } = await supabase
+      .from('task_bookings')
+      .insert([
+        {
+          task_id: req.task_id,
+          user_id: req.user_id,
+          task_status: 'accepted',
+          request_id: req.id,
+        },
+      ])
+      .select('id')
+
+    if (!bookingError) {
+      isActive.value = false
+      await fetchRequests()
+      await fetchTasks()
+      router.push(`/ongoingtask/${data[0].id}`)
+    } else {
+      error.value = bookingError.message
+    }
   } else {
-    error.value = updateError?.message || taskError?.message || deleteError?.message
+    error.value = taskError?.message || deleteError?.message
   }
 }
 </script>
@@ -406,11 +420,7 @@ const acceptRequest = async (req, isActive) => {
                   <v-window-item :value="1">
                     <v-list v-if="!loading && requests.length" class="transparent-list">
                       <template v-for="req in requests" :key="req.id">
-                        <v-list-item
-                          :title="req.fullname"
-                         :subtitle="'Task ID: ' + req.task_id"
-
-                        >
+                        <v-list-item :title="req.fullname" :subtitle="'Task ID: ' + req.task_id">
                           <template #prepend>
                             <v-icon>mdi-account</v-icon>
                           </template>
