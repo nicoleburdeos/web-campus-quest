@@ -7,7 +7,7 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 const bookingId = route.params.id
-const booking = ref(null)
+const booking = ref()
 const statuses = [
   { text: 'Heading to Pickup Point' },
   { text: 'Ordering / Acquiring' },
@@ -35,7 +35,7 @@ onMounted(async () => {
       *,
       tasks (
         id, task_name, task_type, service_fee, payment_method, pickup_point, destination,
-        quantity, status, message, creator_name, review
+        quantity, status, message, creator_name
       ),
       task_requests (
         id, fullname, phone, created_at
@@ -72,24 +72,6 @@ async function prevStatus() {
   }
 }
 
-// Book task in Supabase
-async function bookTask(req) {
-  const { data, error: bookingError } = await supabase
-    .from('task_bookings')
-    .insert([
-      {
-        task_id: req.task_id,
-        user_id: req.user_id,
-        task_status: 'accepted',
-        request_id: req.id,
-      },
-    ])
-    .select('id')
-
-  if (!bookingError && data && data.length > 0) {
-    router.push(`/ongoingtask/${data[0].id}`)
-  }
-}
 </script>
 
 <template>
