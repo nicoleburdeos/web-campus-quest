@@ -251,7 +251,7 @@ const acceptRequest = async (req, isActive) => {
       isActive.value = false
       await fetchRequests()
       await fetchTasks()
-      // router.push(`/ongoingtask/${data[0].id}`) // Removed redirect
+      router.push(`/ongoingtask/${data[0].id}`) // Removed redirect
     } else {
       error.value = bookingError.message
     }
@@ -288,7 +288,7 @@ const fetchRequestorRating = async (req) => {
     <v-container fluid>
       <v-main>
         <div class="main-content">
-          <v-col cols="12" md="8" lg="8">
+          <v-col cols="12" md="9" lg="9">
             <v-card class="mx-auto glass-card" elevation="0">
               <v-img src="/images/cq-logo.png" :height="mobile ? '100' : '70'"></v-img>
               <v-tabs v-model="currentTab" color="green-darken-4" align-tabs="center" grow>
@@ -328,16 +328,28 @@ const fetchRequestorRating = async (req) => {
                           <template #prepend>
                             <v-icon>mdi-account</v-icon>
                           </template>
+
                           <template #append>
-                            <!-- Status Chip -->
                             <v-chip
-                              :color="task.status === 'accepted' ? 'green' : 'orange'"
-                              class="me-2"
+                              class="ms-3"
+                              :color="
+                                task.status === 'accepted'
+                                  ? 'green'
+                                  : task.status === 'complete'
+                                    ? 'blue'
+                                    : 'orange'
+                              "
                               label
                               small
                               text-color="white"
                             >
-                              {{ task.status === 'accepted' ? 'Accepted' : 'Pending' }}
+                              {{
+                                task.status === 'accepted'
+                                  ? 'Accepted'
+                                  : task.status === 'complete'
+                                    ? 'Complete'
+                                    : 'Pending'
+                              }}
                             </v-chip>
                             <v-btn icon variant="plain" size="small" class="info-btn">
                               <v-icon>mdi-information</v-icon>
@@ -414,14 +426,21 @@ const fetchRequestorRating = async (req) => {
                                         <v-col cols="6" class="py-1 px-0"> {{ task.status }}</v-col>
                                       </v-row>
                                       <br />
+                                      <!-- Show alert for accepted or completed status -->
                                       <v-alert
-                                        v-if="task.status === 'accepted'"
-                                        type="success"
+                                        v-if="
+                                          task.status === 'accepted' || task.status === 'complete'
+                                        "
+                                        :type="task.status === 'accepted' ? 'success' : 'info'"
                                         class="mb-2"
                                         border="start"
-                                        color="green"
+                                        :color="task.status === 'accepted' ? 'green' : 'blue'"
                                       >
-                                        This task has already been accepted.
+                                        {{
+                                          task.status === 'accepted'
+                                            ? 'This task has already been accepted.'
+                                            : 'This task has been completed.'
+                                        }}
                                       </v-alert>
                                       <div class="mb-2">Message (optional)</div>
                                       <v-textarea
@@ -448,7 +467,9 @@ const fetchRequestorRating = async (req) => {
                                         rounded="xl"
                                         text="Request"
                                         variant="flat"
-                                        :disabled="task.status === 'accepted'"
+                                        :disabled="
+                                          task.status === 'accepted' || task.status === 'complete'
+                                        "
                                         @click="requestTask(task, isActive)"
                                       >
                                         Request

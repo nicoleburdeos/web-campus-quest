@@ -109,17 +109,20 @@ async function submitRating() {
     })
     .eq('id', bookingId)
 
-  // Also update the task status to 'Completed'
+  // Update the task status to 'complete' (string)
   await supabase
     .from('tasks')
     .update({
-      status: 4, // Use the numeric value for "Completed"
+      status: 'complete',
     })
     .eq('id', booking.value.tasks.id)
 
-  currentStatus.value = 4
-  booking.value.tasks.status = 4
+  currentStatus.value = statuses.length - 1
+  booking.value.tasks.status = 'complete'
   booking.value.rating = rating.value
+
+  // Optional: If you want to trigger a UI update in TaskboardView.vue immediately,
+  // you can emit an event or use a global state/store.
 }
 </script>
 
@@ -182,12 +185,13 @@ async function submitRating() {
           >
           <div class="font-weight-bold">Current Status: {{ statuses[currentStatus].text }}</div>
           <v-btn
-            :disabled="currentStatus === statuses.length - 1"
+            :disabled="currentStatus === statuses.length - 1 || currentStatus === 3"
             @click="nextStatus"
             color="primary"
             variant="outlined"
-            >Next</v-btn
           >
+            Next
+          </v-btn>
         </div>
         <v-timeline density="compact" side="end" line-color="light-green-darken-2">
           <v-timeline-item
