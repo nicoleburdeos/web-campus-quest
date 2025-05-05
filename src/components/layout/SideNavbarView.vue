@@ -6,12 +6,12 @@ import { useRouter } from 'vue-router'
 const drawer = ref(true)
 const router = useRouter()
 
-const userData = ref ({
+const userData = ref({
   email: '',
-  fullname: ' '
+  fullname: ' ',
 })
 
-// Logout Functionality 
+// Logout Functionality
 const onLogout = async () => {
   const { error } = await supabase.auth.signOut()
   if (error) {
@@ -23,10 +23,10 @@ const onLogout = async () => {
 
 // Getting User Information Functionality
 const getUser = async () => {
-  const { 
+  const {
     data: {
-      user: { user_metadata: metadata }
-    } 
+      user: { user_metadata: metadata },
+    },
   } = await supabase.auth.getUser()
 
   userData.value.email = metadata.email
@@ -39,66 +39,62 @@ onMounted(() => {
 </script>
 
 <template>
- 
-            <v-navigation-drawer
-              v-model="drawer"
-              color="green-darken-4"
-              expand-on-hover
-              rail
-              app
-              :temporary="$vuetify.display.smAndDown"
-            >
-              <v-list>
-                <v-list-item
-                  prepend-avatar="public/images/cq-logo.png"
-                  :subtitle="userData.email"
-                  title="CAMPUS QUEST"
-                ></v-list-item>
-              </v-list>
+  <v-navigation-drawer
+    v-model="drawer"
+    color="green-darken-4"
+    expand-on-hover
+    rail
+    app
+    :temporary="$vuetify.display.smAndDown"
+  >
+    <v-list>
+      <v-list-item
+        prepend-avatar="/images/cq-logo.png"
+        :subtitle="userData.email"
+        title="CAMPUS QUEST"
+      ></v-list-item>
+    </v-list>
 
-              <v-divider></v-divider>
+    <v-divider></v-divider>
 
-              <v-list density="compact" nav>
-                <v-list-item
-                  prepend-icon="mdi-plus "
-                  title="New Task"
-                  value="newtask"
-                  to="/new-task"
-                ></v-list-item>
-                <v-list-item
-                  prepend-icon="mdi-clipboard-text"
-                  title="Task Board"
-                  value="taskboard"
-                  to="/task-board"
-                ></v-list-item>
-                <v-list-item
-                  prepend-icon="mdi-clipboard-text"
-                  title="On Going Task"
-                  value="ongoing-tas"
-                  to="/ongoing-task"
-                ></v-list-item>
-                <v-list-item
-                  prepend-icon="mdi-history"
-                  title="Recent Task"
-                  value="recent-task"
-                  to="/recent-task"
-                ></v-list-item>
+    <v-list density="compact" nav>
+      <v-list-item
+        prepend-icon="mdi-plus "
+        title="New Task"
+        value="newtask"
+        to="/new-task"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-clipboard-text"
+        title="Task Board"
+        value="taskboard"
+        to="/task-board"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-clipboard-text"
+        title="On Going Task"
+        value="ongoing-tas"
+        to="/ongoing-task"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-history"
+        title="Recent Task"
+        value="recent-task"
+        to="/recent-task"
+      ></v-list-item>
 
-                <v-list-item
-                  prepend-icon="mdi-account"
-                  title="Personal Account"
-                  value="personalAccount"
-                  to="/profile"
-                ></v-list-item>
-                <v-list-item
-                  prepend-icon="mdi-logout"
-                  title="Log Out"
-                  value="log out"
-                  @click="onLogout"
-                ></v-list-item>
-              </v-list>
-            </v-navigation-drawer>
-       
-
-    
+      <v-list-item
+        prepend-icon="mdi-account"
+        title="Personal Account"
+        value="personalAccount"
+        to="/profile"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-logout"
+        title="Log Out"
+        value="log out"
+        @click="onLogout"
+      ></v-list-item>
+    </v-list>
+  </v-navigation-drawer>
 </template>
