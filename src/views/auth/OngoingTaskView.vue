@@ -109,16 +109,16 @@ async function submitRating() {
     })
     .eq('id', bookingId)
 
-  // Also update the task status to 'accepted' (or 'completed' if you want)
+  // Also update the task status to 'Completed'
   await supabase
     .from('tasks')
     .update({
-      status: 'accepted', // or 'completed' if you want a separate completed state
+      status: 4, // Use the numeric value for "Completed"
     })
     .eq('id', booking.value.tasks.id)
 
   currentStatus.value = 4
-  booking.value.tasks.status = 'accepted' // or 'completed'
+  booking.value.tasks.status = 4
   booking.value.rating = rating.value
 }
 </script>

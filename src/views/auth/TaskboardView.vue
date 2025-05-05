@@ -251,7 +251,7 @@ const acceptRequest = async (req, isActive) => {
       isActive.value = false
       await fetchRequests()
       await fetchTasks()
-      router.push(`/ongoingtask/${data[0].id}`)
+      // router.push(`/ongoingtask/${data[0].id}`) // Removed redirect
     } else {
       error.value = bookingError.message
     }
