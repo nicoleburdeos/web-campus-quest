@@ -201,6 +201,14 @@ async function submitRating() {
           </v-btn>
         </div>
       </v-card>
+
+      <v-card class="mb-6 pa-6 glass-card" elevation="2" v-if="currentStatus === 4">
+        <div class="text-center">
+          <v-btn class="mt-4" color="primary" @click="router.push('/task-board')">
+            Return to Taskboard
+          </v-btn>
+        </div>
+      </v-card>
     </v-container>
   </DashboardView>
 </template>
