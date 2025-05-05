@@ -7,7 +7,7 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 const bookingId = route.params.id
-const booking = ref()
+const booking = ref(null)
 const statuses = [
   { text: 'Heading to Pickup Point' },
   { text: 'Ordering / Acquiring' },
@@ -17,7 +17,7 @@ const statuses = [
 ]
 const statusDescriptions = [
   'Task taker is on their way to the pickup point.',
-  'Task taker is placing the order',
+  'Task taker is placing the order.',
   'Task taker is on the way to the destination.',
   'Task has been successfully delivered or completed.',
   'Task creator has confirmed delivery.',
@@ -28,8 +28,10 @@ const rating = ref(0)
 onMounted(async () => {
   if (!bookingId) {
     console.error('No bookingId in route params')
+    router.push('/task-board') // Redirect to task board if bookingId is missing
     return
   }
+
   const { data, error } = await supabase
     .from('task_bookings')
     .select(
@@ -49,8 +51,10 @@ onMounted(async () => {
 
   if (error) {
     console.error('Error fetching booking:', error)
+    router.push('/task-board') // Redirect to task board on error
     return
   }
+
   booking.value = data
 
   // Ensure status is a number (default to 0 if not)
@@ -63,44 +67,70 @@ onMounted(async () => {
 async function nextStatus() {
   if (currentStatus.value < statuses.length - 1) {
     currentStatus.value++
-    await supabase
+    const { error } = await supabase
       .from('tasks')
       .update({ status: currentStatus.value })
       .eq('id', booking.value.tasks.id)
+
+    if (error) {
+      console.error('Error updating status:', error)
+      return
+    }
+
     booking.value.tasks.status = currentStatus.value
   }
 }
+
 async function prevStatus() {
   if (currentStatus.value > 0) {
     currentStatus.value--
-    await supabase
+    const { error } = await supabase
       .from('tasks')
       .update({ status: currentStatus.value })
       .eq('id', booking.value.tasks.id)
+
+    if (error) {
+      console.error('Error updating status:', error)
+      return
+    }
+
     booking.value.tasks.status = currentStatus.value
   }
 }
 
 // Submit rating to Supabase
 async function submitRating() {
-  // Update rating in task_bookings
-  await supabase
+  if (rating.value === 0) {
+    console.error('Rating cannot be 0')
+    return
+  }
+
+  const { error: ratingError } = await supabase
     .from('task_bookings')
     .update({
       rating: rating.value,
     })
     .eq('id', bookingId)
 
-  // Also update the task status to 'accepted' (or 'completed' if you want)
-  await supabase
+  if (ratingError) {
+    console.error('Error submitting rating:', ratingError)
+    return
+  }
+
+  const { error: statusError } = await supabase
     .from('tasks')
     .update({
-      status: 'accepted', // or 'completed' if you want a separate completed state
+      status: 'completed', // Update to 'completed' after rating
     })
     .eq('id', booking.value.tasks.id)
 
+  if (statusError) {
+    console.error('Error updating task status:', statusError)
+    return
+  }
+
   currentStatus.value = 4
-  booking.value.tasks.status = 'accepted' // or 'completed'
+  booking.value.tasks.status = 'completed'
   booking.value.rating = rating.value
 }
 </script>

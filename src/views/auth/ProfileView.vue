@@ -28,22 +28,27 @@ const getUser = async () => {
 // Fetch average rating
 const fetchAverageRating = async () => {
   // Get the current user's id
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) return
 
   // Fetch all ratings where this user is the task owner (adjust field as needed)
   const { data, error } = await supabase
     .from('task_bookings')
     .select('rating')
-    .eq('user_id', user.id) 
+    .eq('user_id', user.id)
     .not('rating', 'is', null)
 
+  if (error) {
+    console.error('Error fetching ratings:', error)
+    return
+  }
+
   if (data && data.length) {
-    const ratings = data.map(r => r.rating).filter(r => !!r)
+    const ratings = data.map((r) => r.rating).filter((r) => !!r)
     totalRatings.value = ratings.length
-    averageRating.value = ratings.length
-      ? ratings.reduce((a, b) => a + b, 0) / ratings.length
-      : 0
+    averageRating.value = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0
   }
 }
 
@@ -89,7 +94,6 @@ onMounted(() => {
             <div class="text-caption text-white-70">
               {{ totalRatings }} rating{{ totalRatings === 1 ? '' : 's' }}
             </div>
-
           </v-col>
 
           <!-- Right section: User details -->
