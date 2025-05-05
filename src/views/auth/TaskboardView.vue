@@ -15,7 +15,7 @@ const loading = ref(false)
 const error = ref('')
 
 // Add after other refs
-const userHasCreatedTasks = ref(false)
+
 const readRequestIds = ref(new Set())
 
 // Snackbar state
@@ -235,7 +235,7 @@ const acceptRequest = async (req, isActive) => {
     }
 
     // Insert a new booking for this task
-    const { data, error: bookingError } = await supabase
+    const { error: bookingError } = await supabase
       .from('task_bookings')
       .insert([
         {
@@ -262,7 +262,7 @@ const acceptRequest = async (req, isActive) => {
 
 // Add this in your <script setup> in TaskboardView.vue
 const getUserAverageRating = async (userId) => {
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('task_bookings')
     .select('rating')
     .eq('user_id', userId)
