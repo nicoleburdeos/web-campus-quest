@@ -328,17 +328,35 @@ const fetchRequestorRating = async (req) => {
                           <template #prepend>
                             <v-icon>mdi-account</v-icon>
                           </template>
+                          <!-- Add status chip next to the title -->
+                          <template #title>
+                            <div class="d-flex align-center">
+                              <span>{{ task.task_name }}</span>
+                              <v-chip
+                                class="ms-3"
+                                :color="
+                                  task.status === 'accepted'
+                                    ? 'green'
+                                    : task.status === 'complete'
+                                      ? 'blue'
+                                      : 'orange'
+                                "
+                                label
+                                small
+                                text-color="white"
+                              >
+                                {{
+                                  task.status === 'accepted'
+                                    ? 'Accepted'
+                                    : task.status === 'complete'
+                                      ? 'Complete'
+                                      : 'Pending'
+                                }}
+                              </v-chip>
+                            </div>
+                          </template>
                           <template #append>
-                            <!-- Status Chip -->
-                            <v-chip
-                              :color="task.status === 'accepted' ? 'green' : 'orange'"
-                              class="me-2"
-                              label
-                              small
-                              text-color="white"
-                            >
-                              {{ task.status === 'accepted' ? 'Accepted' : 'Pending' }}
-                            </v-chip>
+                 
                             <v-btn icon variant="plain" size="small" class="info-btn">
                               <v-icon>mdi-information</v-icon>
                               <v-dialog activator="parent" max-width="500">
@@ -414,14 +432,21 @@ const fetchRequestorRating = async (req) => {
                                         <v-col cols="6" class="py-1 px-0"> {{ task.status }}</v-col>
                                       </v-row>
                                       <br />
+                                      <!-- Show alert for accepted or completed status -->
                                       <v-alert
-                                        v-if="task.status === 'accepted'"
-                                        type="success"
+                                        v-if="
+                                          task.status === 'accepted' || task.status === 'complete'
+                                        "
+                                        :type="task.status === 'accepted' ? 'success' : 'info'"
                                         class="mb-2"
                                         border="start"
-                                        color="green"
+                                        :color="task.status === 'accepted' ? 'green' : 'blue'"
                                       >
-                                        This task has already been accepted.
+                                        {{
+                                          task.status === 'accepted'
+                                            ? 'This task has already been accepted.'
+                                            : 'This task has been completed.'
+                                        }}
                                       </v-alert>
                                       <div class="mb-2">Message (optional)</div>
                                       <v-textarea
@@ -448,7 +473,9 @@ const fetchRequestorRating = async (req) => {
                                         rounded="xl"
                                         text="Request"
                                         variant="flat"
-                                        :disabled="task.status === 'accepted'"
+                                        :disabled="
+                                          task.status === 'accepted' || task.status === 'complete'
+                                        "
                                         @click="requestTask(task, isActive)"
                                       >
                                         Request
