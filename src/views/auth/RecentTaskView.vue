@@ -1,6 +1,5 @@
 <script setup>
 import DashboardView from '../../components/layout/DashboardView.vue'
-import { ref } from 'vue'
 </script>
 
 <template>
