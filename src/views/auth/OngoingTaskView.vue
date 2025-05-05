@@ -32,7 +32,8 @@ onMounted(async () => {
   }
   const { data, error } = await supabase
     .from('task_bookings')
-    .select(`
+    .select(
+      `
       *,
       tasks (
         id, task_name, task_type, service_fee, payment_method, pickup_point, destination,
@@ -41,7 +42,8 @@ onMounted(async () => {
       task_requests (
         id, fullname, phone, created_at
       )
-    `)
+    `,
+    )
     .eq('id', bookingId)
     .single()
 
@@ -52,9 +54,8 @@ onMounted(async () => {
   booking.value = data
 
   // Ensure status is a number (default to 0 if not)
-  const statusNum = typeof data.tasks?.status === 'number'
-    ? data.tasks.status
-    : parseInt(data.tasks?.status) || 0
+  const statusNum =
+    typeof data.tasks?.status === 'number' ? data.tasks.status : parseInt(data.tasks?.status) || 0
   currentStatus.value = statusNum
 })
 
@@ -62,26 +63,44 @@ onMounted(async () => {
 async function nextStatus() {
   if (currentStatus.value < statuses.length - 1) {
     currentStatus.value++
-    await supabase.from('tasks').update({ status: currentStatus.value }).eq('id', booking.value.tasks.id)
+    await supabase
+      .from('tasks')
+      .update({ status: currentStatus.value })
+      .eq('id', booking.value.tasks.id)
     booking.value.tasks.status = currentStatus.value
   }
 }
 async function prevStatus() {
   if (currentStatus.value > 0) {
     currentStatus.value--
-    await supabase.from('tasks').update({ status: currentStatus.value }).eq('id', booking.value.tasks.id)
+    await supabase
+      .from('tasks')
+      .update({ status: currentStatus.value })
+      .eq('id', booking.value.tasks.id)
     booking.value.tasks.status = currentStatus.value
   }
 }
 
 // Submit rating to Supabase
 async function submitRating() {
-  await supabase.from('task_bookings').update({
-    rating: rating.value // This will be 1-5
-  }).eq('id', bookingId)
+  // Update rating in task_bookings
+  await supabase
+    .from('task_bookings')
+    .update({
+      rating: rating.value,
+    })
+    .eq('id', bookingId)
+
+  // Also update the task status to 'accepted' (or 'completed' if you want)
+  await supabase
+    .from('tasks')
+    .update({
+      status: 'accepted', // or 'completed' if you want a separate completed state
+    })
+    .eq('id', booking.value.tasks.id)
 
   currentStatus.value = 4
-  booking.value.status = 4
+  booking.value.tasks.status = 'accepted' // or 'completed'
   booking.value.rating = rating.value
 }
 </script>
@@ -175,22 +194,13 @@ async function submitRating() {
 
       <v-card class="mb-6 pa-6 glass-card" elevation="2" v-if="currentStatus === 3">
         <div class="text-center">
-          <v-rating
-            v-model="rating"
-            clearable
-          ></v-rating>
+          <v-rating v-model="rating" clearable></v-rating>
           <div class="mt-2">Rate your delivery!</div>
-          <v-btn
-            class="mt-4"
-            color="primary"
-            @click="submitRating"
-            :disabled="rating === 0"
-          >
+          <v-btn class="mt-4" color="primary" @click="submitRating" :disabled="rating === 0">
             Submit
           </v-btn>
         </div>
       </v-card>
-
     </v-container>
   </DashboardView>
 </template>
