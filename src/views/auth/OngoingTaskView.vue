@@ -57,6 +57,11 @@ onMounted(async () => {
   const statusNum =
     typeof data.tasks?.status === 'number' ? data.tasks.status : parseInt(data.tasks?.status) || 0
   currentStatus.value = statusNum
+
+  await syncStatus()
+
+  // Poll every 3 seconds to keep status in sync
+  setInterval(syncStatus, 3000)
 })
 
 // Update status in Supabase
@@ -77,6 +82,19 @@ async function prevStatus() {
       .from('tasks')
       .update({ status: currentStatus.value })
       .eq('id', booking.value.tasks.id)
+    booking.value.tasks.status = currentStatus.value
+  }
+}
+
+// Sync status from Supabase
+async function syncStatus() {
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('status')
+    .eq('id', booking.value.tasks.id)
+    .single()
+  if (!error && data) {
+    currentStatus.value = typeof data.status === 'number' ? data.status : parseInt(data.status) || 0
     booking.value.tasks.status = currentStatus.value
   }
 }
