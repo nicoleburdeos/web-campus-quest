@@ -104,6 +104,27 @@ onMounted(async () => {
   fetchRequests()
 })
 
+onMounted(async () => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return
+
+  setInterval(async () => {
+    // Check if this user has an accepted booking that is not yet rated
+    const { data } = await supabase
+      .from('task_bookings')
+      .select('id, rating')
+      .eq('user_id', user.id)
+      .eq('task_status', 'accepted')
+      .order('created_at', { ascending: false })
+      .limit(1)
+    if (data && data.length && !data[0].rating) {
+      router.push(`/ongoingtask/${data[0].id}`)
+    }
+  }, 3000) // Poll every 3 seconds
+})
+
 // Add computed properties for notification count
 const unreadRequests = computed(() => {
   return requests.value.filter((req) => !readRequestIds.value.has(req.id))
