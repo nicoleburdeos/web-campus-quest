@@ -251,7 +251,7 @@ const acceptRequest = async (req, isActive) => {
       isActive.value = false
       await fetchRequests()
       await fetchTasks()
-      // router.push(`/ongoingtask/${data[0].id}`) // Removed redirect
+      router.push(`/ongoingtask/${data[0].id}`) // Removed redirect
     } else {
       error.value = bookingError.message
     }
@@ -288,7 +288,7 @@ const fetchRequestorRating = async (req) => {
     <v-container fluid>
       <v-main>
         <div class="main-content">
-          <v-col cols="12" md="8" lg="8">
+          <v-col cols="12" md="9" lg="9">
             <v-card class="mx-auto glass-card" elevation="0">
               <v-img src="/images/cq-logo.png" :height="mobile ? '100' : '70'"></v-img>
               <v-tabs v-model="currentTab" color="green-darken-4" align-tabs="center" grow>
@@ -328,35 +328,29 @@ const fetchRequestorRating = async (req) => {
                           <template #prepend>
                             <v-icon>mdi-account</v-icon>
                           </template>
-                          <!-- Add status chip next to the title -->
-                          <template #title>
-                            <div class="d-flex align-center">
-                              <span>{{ task.task_name }}</span>
-                              <v-chip
-                                class="ms-3"
-                                :color="
-                                  task.status === 'accepted'
-                                    ? 'green'
-                                    : task.status === 'complete'
-                                      ? 'blue'
-                                      : 'orange'
-                                "
-                                label
-                                small
-                                text-color="white"
-                              >
-                                {{
-                                  task.status === 'accepted'
-                                    ? 'Accepted'
-                                    : task.status === 'complete'
-                                      ? 'Complete'
-                                      : 'Pending'
-                                }}
-                              </v-chip>
-                            </div>
-                          </template>
+
                           <template #append>
-                 
+                            <v-chip
+                              class="ms-3"
+                              :color="
+                                task.status === 'accepted'
+                                  ? 'green'
+                                  : task.status === 'complete'
+                                    ? 'blue'
+                                    : 'orange'
+                              "
+                              label
+                              small
+                              text-color="white"
+                            >
+                              {{
+                                task.status === 'accepted'
+                                  ? 'Accepted'
+                                  : task.status === 'complete'
+                                    ? 'Complete'
+                                    : 'Pending'
+                              }}
+                            </v-chip>
                             <v-btn icon variant="plain" size="small" class="info-btn">
                               <v-icon>mdi-information</v-icon>
                               <v-dialog activator="parent" max-width="500">

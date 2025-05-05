@@ -185,12 +185,13 @@ async function submitRating() {
           >
           <div class="font-weight-bold">Current Status: {{ statuses[currentStatus].text }}</div>
           <v-btn
-            :disabled="currentStatus === statuses.length - 1"
+            :disabled="currentStatus === statuses.length - 1 || currentStatus === 3"
             @click="nextStatus"
             color="primary"
             variant="outlined"
-            >Next</v-btn
           >
+            Next
+          </v-btn>
         </div>
         <v-timeline density="compact" side="end" line-color="light-green-darken-2">
           <v-timeline-item
