@@ -71,7 +71,7 @@ onMounted(() => {
         to="/task-board"
       ></v-list-item>
       <v-list-item
-        prepend-icon="mdi-clipboard-text"
+        prepend-icon="mdi-clipboard-clock-outline"
         title="On Going Task"
         value="ongoing-tas"
         to="/ongoing-task"
