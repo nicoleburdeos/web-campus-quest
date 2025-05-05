@@ -61,7 +61,7 @@ const router = createRouter({
     },
 
     {
-      path: '/not-found',
+      path: '/ongoing-task',
       name: 'not-found',
       component: NotFoundView,
     },

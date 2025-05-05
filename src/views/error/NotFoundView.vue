@@ -21,10 +21,10 @@ onMounted(async () => {
             <h1 class="text-h1 font-weight-black text-green-darken-4">404</h1>
             <h2 class="text-h2 font-weight-black mb-2">Page Not Found</h2>
 
-            <p class="text-subtitle-1 font-weight-bold mb-4">Page does not exist.</p>
+            <p class="text-subtitle-1 font-weight-bold mb-4">Ooops create a task first</p>
 
-            <v-btn class="mt-2" color="green-darken-4" prepend-icon="mdi-home" to="/">
-              Back to {{ isLoggedIn ? 'Dashboard' : 'Homepage' }}
+            <v-btn class="mt-2" color="green-darken-4" prepend-icon="mdi-home" to="/task-board">
+              Back to {{ isLoggedIn ? 'Dashboard' : 'Taskboard' }}
             </v-btn>
           </v-col>
         </v-row>
