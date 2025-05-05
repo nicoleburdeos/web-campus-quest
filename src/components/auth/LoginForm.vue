@@ -1,9 +1,12 @@
 <script setup>
 import { requiredValidator, emailValidator } from '@/utils/validators'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { supabase } from '@/utils/supabase'
 
 const isPasswordVisible = ref(false)
 const refVForm = ref()
+const router = useRouter()
 
 const formDataDefault = {
   email: '',
@@ -13,7 +16,15 @@ const formDataDefault = {
 const formData = ref({ ...formDataDefault })
 
 const onSubmit = async () => {
-  alert(formData.value.email)
+  const { error } = await supabase.auth.signInWithPassword({
+    email: formData.value.email,
+    password: formData.value.password,
+  })
+  if (error) {
+    alert('Login failed: ' + error.message)
+  } else {
+    router.replace('/task-board')
+  }
 }
 
 const onFormSubmit = () => {

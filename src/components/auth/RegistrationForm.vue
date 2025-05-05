@@ -47,7 +47,7 @@ const onSubmit = async () => {
   } else if (data) {
     console.log(data)
     formAction.value.formSuccessMessage = 'Successfully Registered'
-    router.replace('/dashboard')
+    router.replace('/register')
   }
 
   //Reset Form

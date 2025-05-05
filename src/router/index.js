@@ -1,10 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '@/views/auth/LoginView.vue'
 import RegisterView from '@/views/auth/RegisterView.vue'
-import DashboardView from '@/views/auth/DashboardView.vue'
+import DashboardView from '@/components/layout/DashboardView.vue'
 import NewView from '@/views/NewView.vue'
 import TaskBoardView from '@/views/auth/TaskboardView.vue'
 import RecentTaskView from '@/views/auth/RecentTaskView.vue'
+import ProfileView from '@/views/auth/ProfileView.vue'
+import NotFoundView from '@/views/error/NotFoundView.vue'
+import SideNavbarView from '@/components/layout/SideNavbarView.vue'
+import OngoingTaskView from '@/views/auth/OngoingTaskView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,6 +45,31 @@ const router = createRouter({
       path: '/recent-task',
       name: 'recent-task',
       component: RecentTaskView,
+    },
+
+
+
+    {
+      path: '/ongoingtask/:id',
+      component: OngoingTaskView,
+    },
+
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ProfileView,
+    },
+
+    {
+      path: '/ongoing-task',
+      name: 'not-found',
+      component: NotFoundView,
+    },
+
+    {
+      path: '/side-navbar',
+      name: 'side-navbar',
+      component: SideNavbarView,
     },
   ],
 })
