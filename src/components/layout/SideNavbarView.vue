@@ -68,7 +68,7 @@ const navItems = [
   >
     <v-list class="pt-4">
       <v-list-item
-        prepend-avatar="public/images/cq-logo.png"
+        prepend-avatar="/public/images/cq-logo.png"
         :subtitle="userData.email"
         title="CAMPUS QUEST"
       >
