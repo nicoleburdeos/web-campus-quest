@@ -24,6 +24,13 @@ const statusDescriptions = [
 ]
 const currentStatus = ref(0)
 const rating = ref(0)
+let syncInterval = null
+
+function statusToIndex(status) {
+  if (status === 'complete') return statuses.length - 1
+  const num = typeof status === 'number' ? status : parseInt(status)
+  return isNaN(num) ? 0 : Math.max(0, Math.min(num, statuses.length - 1))
+}
 
 onMounted(async () => {
   if (!bookingId) {
@@ -53,15 +60,14 @@ onMounted(async () => {
   }
   booking.value = data
 
-  // Ensure status is a number (default to 0 if not)
-  const statusNum =
-    typeof data.tasks?.status === 'number' ? data.tasks.status : parseInt(data.tasks?.status) || 0
-  currentStatus.value = statusNum
+  currentStatus.value = statusToIndex(data.tasks?.status)
 
   await syncStatus()
 
-  // Poll every 3 seconds to keep status in sync
-  setInterval(syncStatus, 3000)
+  // Start polling only if not delivered or completed
+  if (currentStatus.value < 3) {
+    syncInterval = setInterval(syncStatus, 3000)
+  }
 })
 
 // Update status in Supabase
@@ -94,8 +100,14 @@ async function syncStatus() {
     .eq('id', booking.value.tasks.id)
     .single()
   if (!error && data) {
-    currentStatus.value = typeof data.status === 'number' ? data.status : parseInt(data.status) || 0
-    booking.value.tasks.status = currentStatus.value
+    currentStatus.value = statusToIndex(data.status)
+    booking.value.tasks.status = data.status
+
+    // Stop polling if delivered or completed
+    if (currentStatus.value >= 3 && syncInterval) {
+      clearInterval(syncInterval)
+      syncInterval = null
+    }
   }
 }
 
