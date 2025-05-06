@@ -75,7 +75,7 @@ const navItems = [
         <!-- Add custom avatar size -->
         <template #prepend>
           <v-avatar size="48" class="my-2">
-            <v-img src="/public/images/cq-logo.png" alt="Campus Quest Logo."></v-img> 
+            <v-img src="/images/cq-logo.png" alt="Campus Quest Logo."></v-img>
           </v-avatar>
         </template>
       </v-list-item>
