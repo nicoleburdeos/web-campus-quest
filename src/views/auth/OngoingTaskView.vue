@@ -174,26 +174,38 @@ async function submitRating() {
       </v-card>
 
       <!-- Status Timeline -->
-      <v-card class="mb-6 pa-6 glass-card" elevation="1">
-        <div class="d-flex justify-space-between align-center mb-4">
+      <v-card class="mb-6 pa-4 pa-sm-5 pa-md-6 glass-card" elevation="1">
+        <div class="d-flex flex-column flex-sm-row justify-space-between align-center mb-4 gap-y-4">
           <v-btn
             :disabled="currentStatus === 0"
             @click="prevStatus"
             color="primary"
             variant="outlined"
-            >Previous</v-btn
+            class="w-100 w-sm-auto"
+            :block="$vuetify.display.smAndDown"
           >
-          <div class="font-weight-bold">Current Status: {{ statuses[currentStatus].text }}</div>
+            Previous
+          </v-btn>
+          <div class="font-weight-bold text-center text-sm-start">
+            Current Status: {{ statuses[currentStatus].text }}
+          </div>
           <v-btn
             :disabled="currentStatus === statuses.length - 1 || currentStatus === 3"
             @click="nextStatus"
             color="primary"
             variant="outlined"
+            class="w-100 w-sm-auto"
+            :block="$vuetify.display.smAndDown"
           >
             Next
           </v-btn>
         </div>
-        <v-timeline density="compact" side="end" line-color="light-green-darken-2">
+        <v-timeline
+          density="compact"
+          side="end"
+          line-color="light-green-darken-2"
+          :class="{ 'timeline-mobile': $vuetify.display.smAndDown }"
+        >
           <v-timeline-item
             v-for="(status, idx) in statuses"
             :key="status.text"
@@ -205,10 +217,35 @@ async function submitRating() {
           >
             <div class="d-flex flex-column flex-grow-1">
               <div>
-                <span v-if="idx === currentStatus" class="font-weight-bold">{{ status.text }}</span>
-                <span v-else>{{ status.text }}</span>
+                <span
+                  v-if="idx === currentStatus"
+                  class="font-weight-bold"
+                  :class="{
+                    'text-body-2': $vuetify.display.xs,
+                    'text-body-1': $vuetify.display.smAndUp,
+                  }"
+                >
+                  {{ status.text }}
+                </span>
+                <span
+                  v-else
+                  :class="{
+                    'text-body-2': $vuetify.display.xs,
+                    'text-body-1': $vuetify.display.smAndUp,
+                  }"
+                >
+                  {{ status.text }}
+                </span>
               </div>
-              <div class="text-grey text-body-2 mb-1">{{ statusDescriptions[idx] }}</div>
+              <div
+                class="text-grey mb-1"
+                :class="{
+                  'text-caption': $vuetify.display.xs,
+                  'text-body-2': $vuetify.display.smAndUp,
+                }"
+              >
+                {{ statusDescriptions[idx] }}
+              </div>
             </div>
           </v-timeline-item>
         </v-timeline>
@@ -216,7 +253,7 @@ async function submitRating() {
 
       <v-card class="mb-6 pa-6 glass-card" elevation="2" v-if="currentStatus === 3">
         <div class="text-center">
-          <v-rating v-model="rating" clearable     color="yellow-darken-3"></v-rating>
+          <v-rating v-model="rating" clearable color="yellow-darken-3"></v-rating>
           <div class="mt-2">Rate your delivery!</div>
           <v-btn class="mt-4" color="success" @click="submitRating" :disabled="rating === 0">
             Submit
@@ -254,5 +291,25 @@ async function submitRating() {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+}
+
+.timeline-mobile {
+  font-size: 0.9rem;
+  padding: 0.5rem;
+}
+
+/* Responsive padding adjustments */
+@media (max-width: 600px) {
+  .glass-card {
+    padding: 1rem !important;
+  }
+}
+
+/* Add spacing between stacked buttons on mobile */
+.gap-y-4 > * {
+  margin-bottom: 1rem;
+}
+.gap-y-4 > *:last-child {
+  margin-bottom: 0;
 }
 </style>
