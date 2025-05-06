@@ -216,9 +216,9 @@ async function submitRating() {
 
       <v-card class="mb-6 pa-6 glass-card" elevation="2" v-if="currentStatus === 3">
         <div class="text-center">
-          <v-rating v-model="rating" clearable></v-rating>
+          <v-rating v-model="rating" clearable     color="yellow-darken-3"></v-rating>
           <div class="mt-2">Rate your delivery!</div>
-          <v-btn class="mt-4" color="primary" @click="submitRating" :disabled="rating === 0">
+          <v-btn class="mt-4" color="success" @click="submitRating" :disabled="rating === 0">
             Submit
           </v-btn>
         </div>
@@ -226,7 +226,7 @@ async function submitRating() {
 
       <v-card class="mb-6 pa-6 glass-card" elevation="2" v-if="currentStatus === 4">
         <div class="text-center">
-          <v-btn class="mt-4" color="primary" @click="router.push('/task-board')">
+          <v-btn class="mt-4" color="success" @click="router.push('/task-board')">
             Return to Taskboard
           </v-btn>
         </div>
