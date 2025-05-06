@@ -49,7 +49,6 @@ const navItems = [
   { title: 'New Task', icon: 'mdi-plus', to: '/new-task' },
   { title: 'Task Board', icon: 'mdi-clipboard-text', to: '/task-board' },
   { title: 'On Going Task', icon: 'mdi-clipboard-clock-outline', to: '/ongoing-task' },
-  { title: 'Recent Task', icon: 'mdi-history', to: '/recent-task' },
   { title: 'Personal Account', icon: 'mdi-account', to: '/profile' },
 ]
 </script>

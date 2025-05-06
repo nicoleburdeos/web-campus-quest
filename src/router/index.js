@@ -4,7 +4,6 @@ import RegisterView from '@/views/auth/RegisterView.vue'
 import DashboardView from '@/components/layout/DashboardView.vue'
 import NewView from '@/views/NewView.vue'
 import TaskBoardView from '@/views/auth/TaskboardView.vue'
-import RecentTaskView from '@/views/auth/RecentTaskView.vue'
 import ProfileView from '@/views/auth/ProfileView.vue'
 import NotFoundView from '@/views/error/NotFoundView.vue'
 import SideNavbarView from '@/components/layout/SideNavbarView.vue'
@@ -39,12 +38,6 @@ const router = createRouter({
       path: '/task-board',
       name: 'task-board',
       component: TaskBoardView,
-    },
-
-    {
-      path: '/recent-task',
-      name: 'recent-task',
-      component: RecentTaskView,
     },
 
 

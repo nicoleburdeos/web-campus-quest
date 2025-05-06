@@ -336,7 +336,7 @@ const fetchRequestorRating = async (req) => {
                                 task.status === 'accepted'
                                   ? 'green'
                                   : task.status === 'complete'
-                                    ? 'blue'
+                                    ? 'green-darken-4'
                                     : 'orange'
                               "
                               label
