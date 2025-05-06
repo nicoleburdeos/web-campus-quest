@@ -95,7 +95,10 @@ const fetchRequests = async () => {
   loading.value = false
 }
 
+const currentUser = ref(null)
 onMounted(async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  currentUser.value = user
   const storageKey = await getStorageKey()
   if (storageKey) {
     readRequestIds.value = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]'))
@@ -469,7 +472,7 @@ const fetchRequestorRating = async (req) => {
                                         text="Request"
                                         variant="flat"
                                         :disabled="
-                                          task.status === 'accepted' || task.status === 'complete'
+                                          task.status === 'accepted' || task.status === 'complete' || (currentUser && task.user_id === currentUser.id)
                                         "
                                         @click="requestTask(task, isActive)"
                                       >
