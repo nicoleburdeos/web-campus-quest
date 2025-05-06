@@ -8,6 +8,7 @@ const router = useRouter()
 const route = useRoute()
 const bookingId = route.params.id
 const booking = ref()
+const user = ref(null)
 const statuses = [
   { text: 'Heading to Pickup Point' },
   { text: 'Ordering / Acquiring' },
@@ -37,6 +38,11 @@ onMounted(async () => {
     console.error('No bookingId in route params')
     return
   }
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser()
+  user.value = currentUser
+
   const { data, error } = await supabase
     .from('task_bookings')
     .select(
@@ -44,7 +50,7 @@ onMounted(async () => {
       *,
       tasks (
         id, task_name, task_type, service_fee, payment_method, pickup_point, destination,
-        quantity, status, message, creator_name
+        quantity, status, message, creator_name, user_id
       ),
       task_requests (
         id, fullname, phone, created_at
@@ -263,7 +269,12 @@ async function submitRating() {
         </v-timeline>
       </v-card>
 
-      <v-card class="mb-6 pa-6 glass-card" elevation="2" v-if="currentStatus === 3">
+      <!-- Only show rating if current user is the task creator -->
+      <v-card
+        class="mb-6 pa-6 glass-card"
+        elevation="2"
+        v-if="currentStatus === 3 && user && user.id === booking.tasks.user_id"
+      >
         <div class="text-center">
           <v-rating v-model="rating" clearable color="yellow-darken-3"></v-rating>
           <div class="mt-2">Rate your delivery!</div>
