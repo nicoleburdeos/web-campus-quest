@@ -1,6 +1,7 @@
 <script setup>
 import DashboardView from '../components/layout/DashboardView.vue'
 import { ref } from 'vue'
+
 import { useDisplay } from 'vuetify'
 import { supabase } from '@/utils/supabase'
 import { useRouter } from 'vue-router'
@@ -90,7 +91,7 @@ const handleSubmit = async () => {
     // Format the data
     const taskData = {
       user_id: user.id,
-      creator_name, 
+      creator_name,
       task_name: formData.value.task_name,
       pickup_point: formData.value.pickup_point,
       destination: formData.value.destination,
