@@ -234,8 +234,8 @@ const acceptRequest = async (req, isActive) => {
       tasks.value[taskIdx].status = 'accepted'
     }
 
-    // Insert a new booking for this task
-    const { error: bookingError } = await supabase
+    // Insert a new booking for this task and capture the response data
+    const { data, error: bookingError } = await supabase
       .from('task_bookings')
       .insert([
         {
@@ -246,12 +246,13 @@ const acceptRequest = async (req, isActive) => {
         },
       ])
       .select('id')
+      .single()
 
-    if (!bookingError) {
+    if (!bookingError && data) {
       isActive.value = false
       await fetchRequests()
       await fetchTasks()
-      router.push(`/ongoingtask/${data[0].id}`) // Removed redirect
+      router.push(`/ongoingtask/${data.id}`) // Now using the correct booking ID
     } else {
       error.value = bookingError.message
     }
