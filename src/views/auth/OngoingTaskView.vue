@@ -50,8 +50,7 @@ onMounted(async () => {
       *,
       tasks (
         id, task_name, task_type, service_fee, payment_method, pickup_point, destination,
-
-        quantity, status, message, creator_name
+        quantity, status, message, creator_name, user_id
       ),
       task_requests (
         id, fullname, phone, created_at
